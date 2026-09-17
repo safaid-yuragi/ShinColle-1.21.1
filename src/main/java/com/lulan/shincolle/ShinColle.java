@@ -68,6 +68,7 @@ public class ShinColle
         modBus.addListener(this::onConfigReload);
         modBus.addListener(this::registerAttributes);
         modBus.addListener(this::registerSpawnPlacements);
+        modBus.addListener(com.lulan.shincolle.network.ModNetwork::register);
     }
 
     /**

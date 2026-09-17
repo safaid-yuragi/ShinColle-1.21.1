@@ -1406,6 +1406,27 @@ abstract public class BasicEntityShip extends TamableAnimal implements IShipGuar
         return true;
     }
 
+    /** heavy cannon attack on a block position (player skill ground target) */
+    public boolean attackEntityWithHeavyAmmo(net.minecraft.core.BlockPos pos)
+    {
+        if (!decrAmmoNum(1, this.getAmmoConsumption())) return false;
+
+        this.addShipExp(ShinColleConfig.expGain[2]);
+        decrGrudgeNum(ShinColleConfig.consumeGrudgeAction[ID.ShipConsume.HAtk]);
+        decrMorale(2);
+        setCombatTick(this.tickCount);
+
+        applySoundAtAttacker(2, null);
+
+        float atk = getAttackBaseDamage(2, null);
+        summonMissile(2, atk, pos.getX() + 0.5F, pos.getY(), pos.getZ() + 0.5F, 1F);
+
+        applyEmotesReaction(3);
+        if (ShinColleConfig.canFlare) flareTarget(pos);
+
+        return true;
+    }
+
     /** spawn attack missile; attackType 0:melee 1:light 2:heavy */
     public void summonMissile(int attackType, float atk, float tarX, float tarY, float tarZ,
             float targetHeight)

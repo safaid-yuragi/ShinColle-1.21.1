@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * rideable ship-mount base (legacy BasicEntityMount).
@@ -26,6 +27,9 @@ abstract public class BasicEntityMount extends BasicEntitySummon
     protected Entity guardedEntity;
     protected BlockPos lastWaypoint = BlockPos.ZERO;
 
+    /** rider jump key state (server, fed by MountMovePayload) */
+    protected int riderJumpTicks = 0;
+
 
     public BasicEntityMount(EntityType<? extends BasicEntityMount> type, Level level)
     {
@@ -39,10 +43,72 @@ abstract public class BasicEntityMount extends BasicEntitySummon
         return this.host instanceof BasicEntityShip s ? s : null;
     }
 
+    /* ==================== riding ==================== */
+
+    @Nullable
+    @Override
+    public net.minecraft.world.entity.LivingEntity getControllingPassenger()
+    {
+        return this.getFirstPassenger() instanceof net.minecraft.world.entity.LivingEntity le
+            ? le : null;
+    }
+
+    /**
+     * ridden movement: follow passenger input. Vanilla syncs player
+     * directional input for vehicles, so no extra packet is needed.
+     */
+    @Override
+    public void travel(Vec3 input)
+    {
+        if (!this.isAlive()) return;
+
+        if (this.isVehicle() && this.getControllingPassenger() instanceof
+                net.minecraft.world.entity.player.Player player)
+        {
+            this.setYRot(player.getYRot());
+            this.yRotO = this.getYRot();
+            this.setXRot(player.getXRot() * 0.5F);
+            this.setRot(this.getYRot(), this.getXRot());
+            this.yHeadRot = this.yBodyRot = this.getYRot();
+
+            float strafe = player.xxa * 0.5F;
+            float forward = player.zza;
+            if (forward <= 0F) forward *= 0.25F;
+
+            if (this.riderJumpTicks > 0 && (this.onGround() || this.isInWater()))
+            {
+                this.jumpFromGround();
+            }
+
+            var speed = this.getAttribute(
+                net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED);
+            if (speed != null) this.setSpeed((float) speed.getValue());
+
+            super.travel(new Vec3(strafe, input.y, forward));
+        }
+        else
+        {
+            super.travel(input);
+        }
+    }
+
     @Override
     public boolean canDrownInFluidType(net.neoforged.neoforge.fluids.FluidType type)
     {
     	return false;
+    }
+
+    /** set by MountMovePayload; held for a couple of ticks */
+    public void setRiderJump(boolean jumping)
+    {
+        this.riderJumpTicks = jumping ? 2 : 0;
+    }
+
+    @Override
+    public void tick()
+    {
+        super.tick();
+        if (this.riderJumpTicks > 0) this.riderJumpTicks--;
     }
 
     /* ==================== IShipGuardian ==================== */
