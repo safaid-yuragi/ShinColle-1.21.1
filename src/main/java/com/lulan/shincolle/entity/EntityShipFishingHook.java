@@ -34,6 +34,16 @@ public class EntityShipFishingHook extends Entity
         if (owner != null) this.ownerId = owner.getId();
     }
 
+    @Nullable
+    public Entity getOwner()
+    {
+        if (this.owner == null && this.ownerId >= 0 && this.level() != null)
+        {
+            this.owner = this.level().getEntity(this.ownerId);
+        }
+        return this.owner;
+    }
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {}
 
