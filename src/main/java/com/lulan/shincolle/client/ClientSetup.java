@@ -8,8 +8,13 @@ import com.lulan.shincolle.client.render.MountRenderer;
 import com.lulan.shincolle.client.render.ShipFishingHookRenderer;
 import com.lulan.shincolle.client.render.ShipRenderer;
 import com.lulan.shincolle.client.render.SummonRenderer;
+import com.lulan.shincolle.client.render.block.DeskBlockEntityRenderer;
+import com.lulan.shincolle.client.render.block.LargeShipyardBlockEntityRenderer;
+import com.lulan.shincolle.client.render.block.SmallShipyardBlockEntityRenderer;
 import com.lulan.shincolle.reference.ID;
 import com.lulan.shincolle.reference.Reference;
+import com.lulan.shincolle.registry.ModBlockEntities;
+import com.lulan.shincolle.registry.ModBlocks;
 import com.lulan.shincolle.registry.ModEntities;
 import com.lulan.shincolle.utility.LogHelper;
 
@@ -20,6 +25,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
 /**
@@ -169,6 +175,18 @@ public final class ClientSetup
         event.registerEntityRenderer(ModEntities.PROJECTILE_STATIC.get(), InvisibleEntityRenderer::new);
         event.registerEntityRenderer(ModEntities.SHIP_FISHING_HOOK.get(), ShipFishingHookRenderer::new);
         event.registerEntityRenderer(ModEntities.BASIC_ENTITY_ITEM.get(), BasicEntityItemRenderer::new);
+
+        //block entity renderers (legacy TESR)
+        event.registerBlockEntityRenderer(ModBlockEntities.TILEENTITYDESK.get(), DeskBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.TILEENTITYSMALLSHIPYARD.get(), SmallShipyardBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.TILEMULTIGRUDGEHEAVY.get(), LargeShipyardBlockEntityRenderer::new);
+    }
+
+    /** custom item renderers (legacy TileEntityItemStackRenderer) */
+    @SubscribeEvent
+    public static void registerClientExtensions(RegisterClientExtensionsEvent event)
+    {
+        event.registerItem(new ShinColleItemExtensions(), ModBlocks.ITEM_DESK, ModBlocks.ITEM_SMALL_SHIPYARD);
     }
 
 

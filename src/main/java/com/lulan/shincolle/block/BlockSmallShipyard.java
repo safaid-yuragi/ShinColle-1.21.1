@@ -9,6 +9,9 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.MapColor;
 
 /**
@@ -18,9 +21,20 @@ public class BlockSmallShipyard extends BasicBlockFacingContainer
 {
 
 
+    /** true while building (legacy meta bit 3) */
+    public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
+
+
     public BlockSmallShipyard()
     {
         super(BlockBehaviour.Properties.of().mapColor(MapColor.METAL).requiresCorrectToolForDrops().strength(10F).sound(SoundType.METAL).lightLevel(s -> 15));
+        this.registerDefaultState(this.defaultBlockState().setValue(ACTIVE, false));
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
+    {
+        builder.add(FACING, ACTIVE);
     }
 
     @Nullable
