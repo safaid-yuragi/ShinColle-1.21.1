@@ -59,8 +59,12 @@ public final class ModItems
 
     //misc items
     public static final DeferredItem<BasicItem> BUCKET_REPAIR = item("bucket_repair");
-    public static final DeferredItem<BasicItem> DESK_ITEM_BOOK = item("desk_item_book");
-    public static final DeferredItem<BasicItem> DESK_ITEM_RADAR = item("desk_item_radar");
+    public static final DeferredItem<com.lulan.shincolle.item.DeskItem> DESK_ITEM_BOOK =
+        registerAll("desk_item_book",
+            () -> new com.lulan.shincolle.item.DeskItem(new Item.Properties(), 2));
+    public static final DeferredItem<com.lulan.shincolle.item.DeskItem> DESK_ITEM_RADAR =
+        registerAll("desk_item_radar",
+            () -> new com.lulan.shincolle.item.DeskItem(new Item.Properties(), 1));
     public static final DeferredItem<BasicItem> INSTANT_CON_MAT = item("instant_con_mat");
     public static final DeferredItem<BasicItem> KAITAI_HAMMER = item("kaitai_hammer");
     public static final DeferredItem<BasicItem> MARRIAGE_RING = item("marriage_ring");

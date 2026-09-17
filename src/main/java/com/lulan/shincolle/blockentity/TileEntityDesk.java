@@ -24,7 +24,7 @@ public class TileEntityDesk extends BasicBlockEntity
         int containerId, net.minecraft.world.entity.player.Inventory inv,
         net.minecraft.world.entity.player.Player player)
     {
-        return new com.lulan.shincolle.menu.DeskMenu(containerId, inv, this);
+        return new com.lulan.shincolle.menu.DeskMenu(containerId, inv, this, 0);
     }
 
 
