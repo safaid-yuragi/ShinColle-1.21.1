@@ -29,3 +29,5 @@ runs/
 
 # neoform/neoForge runtime dirs
 logs/
+
+/.commandcode
