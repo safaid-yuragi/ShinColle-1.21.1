@@ -1508,6 +1508,23 @@ abstract public class BasicEntityShip extends TamableAnimal implements IShipGuar
     public void applyParticleEmotion(int type)
     {
         this.setStateEmotion(ID.S.Emotion, type, true);
+
+        //server: spawn emotion icon particle for nearby players
+        if (this.level() instanceof ServerLevel)
+        {
+            float h = this.getIsSitting() ? this.getBbHeight() * 0.4F : this.getBbHeight() * 0.45F;
+            com.lulan.shincolle.reference.dataclass.ParticleData data =
+                new com.lulan.shincolle.reference.dataclass.ParticleData(
+                    com.lulan.shincolle.reference.Enums.ParType.EMOTION_ENTITY);
+            data.setFloatData((float) this.getX());
+            data.setFloatData((float) this.getY());
+            data.setFloatData((float) this.getZ());
+            data.setFloatData(h);
+            data.setIntData(this.getId());   //host entity ID
+            data.setIntData(0);              //host type
+            data.setIntData(type);           //emotion type
+            com.lulan.shincolle.network.ModNetwork.sendParticleData(this, data);
+        }
     }
 
     /** flare effect on target pos (reveal submarine) */

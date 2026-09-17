@@ -25,6 +25,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
@@ -187,6 +188,24 @@ public final class ClientSetup
     public static void registerClientExtensions(RegisterClientExtensionsEvent event)
     {
         event.registerItem(new ShinColleItemExtensions(), ModBlocks.ITEM_DESK, ModBlocks.ITEM_SMALL_SHIPYARD);
+    }
+
+    /**
+     * particle sprite sets. Custom particles are spawned through
+     * ClientParticleHelper (ParticleData path), so providers only capture
+     * the atlas sprite sets used by manually-constructed particles.
+     */
+    @SubscribeEvent
+    public static void registerParticleProviders(RegisterParticleProvidersEvent event)
+    {
+        event.registerSpriteSet(com.lulan.shincolle.registry.ModParticles.SMOKE.get(),
+            sprites ->
+            {
+                com.lulan.shincolle.client.particle.ShipParticleSprites.SMOKE = sprites;
+                return (type, level, x, y, z, xd, yd, zd) ->
+                    new com.lulan.shincolle.client.particle.ParticleSmoke(
+                        level, x, y, z, xd, yd, zd, 1F, sprites);
+            });
     }
 
 

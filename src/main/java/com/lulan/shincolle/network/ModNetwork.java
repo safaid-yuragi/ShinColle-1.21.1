@@ -4,6 +4,7 @@ import com.lulan.shincolle.client.ClientPayloadHandlers;
 import com.lulan.shincolle.entity.IShipState;
 import com.lulan.shincolle.network.payload.EntityMotionPayload;
 import com.lulan.shincolle.network.payload.MountMovePayload;
+import com.lulan.shincolle.network.payload.ParticleDataPayload;
 import com.lulan.shincolle.network.payload.EntityPosRotPayload;
 import com.lulan.shincolle.network.payload.PairingPayload;
 import com.lulan.shincolle.network.payload.PlayerSkillPayload;
@@ -44,6 +45,8 @@ public final class ModNetwork
             ClientPayloadHandlers::handleMotion);
         registrar.playToClient(SpawnParticlePayload.TYPE, SpawnParticlePayload.STREAM_CODEC,
             ClientPayloadHandlers::handleSpawnParticle);
+        registrar.playToClient(ParticleDataPayload.TYPE, ParticleDataPayload.STREAM_CODEC,
+            ClientPayloadHandlers::handleParticleData);
 
         //C2S
         registrar.playToServer(PlayerSkillPayload.TYPE, PlayerSkillPayload.STREAM_CODEC,
@@ -96,6 +99,26 @@ public final class ModNetwork
     {
         PacketDistributor.sendToPlayersTrackingEntity(anchor,
             new SpawnParticlePayload(options, x, y, z, dx, dy, dz, count, param));
+    }
+
+    /** legacy ParticleData packet to players near the anchor entity (64 blocks) */
+    public static void sendParticleData(Entity anchor,
+            com.lulan.shincolle.reference.dataclass.ParticleData data)
+    {
+        if (anchor == null || anchor.level() == null) return;
+        PacketDistributor.sendToPlayersNear(
+            (net.minecraft.server.level.ServerLevel) anchor.level(),
+            null, anchor.getX(), anchor.getY(), anchor.getZ(), 64D,
+            new ParticleDataPayload(data));
+    }
+
+    /** legacy ParticleData packet to players near a fixed position (64 blocks) */
+    public static void sendParticleData(net.minecraft.server.level.ServerLevel level,
+            double x, double y, double z,
+            com.lulan.shincolle.reference.dataclass.ParticleData data)
+    {
+        PacketDistributor.sendToPlayersNear(level, null, x, y, z, 64D,
+            new ParticleDataPayload(data));
     }
 
 

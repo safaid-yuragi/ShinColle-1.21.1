@@ -93,6 +93,25 @@ public final class ClientPayloadHandlers
     }
 
 
+    /** legacy ParticleData particle spawn -> client particle factory dispatch */
+    public static void handleParticleData(com.lulan.shincolle.network.payload.ParticleDataPayload payload,
+            IPayloadContext context)
+    {
+        context.enqueueWork(() ->
+        {
+            try
+            {
+                com.lulan.shincolle.client.particle.ClientParticleHelper.spawn(
+                    payload.toData());
+            }
+            catch (Throwable t)
+            {
+                com.lulan.shincolle.utility.LogHelper.info("EXCEPTION: client spawn particle fail: " + t);
+            }
+        });
+    }
+
+
     private ClientPayloadHandlers() {}
 
 }

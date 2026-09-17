@@ -11,6 +11,7 @@ import com.lulan.shincolle.entity.BasicEntityShip;
 import com.lulan.shincolle.entity.IShipFlyable;
 import com.lulan.shincolle.entity.IShipNavigator;
 import com.lulan.shincolle.entity.IShipOwner;
+import com.lulan.shincolle.reference.Values;
 import com.lulan.shincolle.registry.ModItems;
 
 import net.minecraft.core.BlockPos;
@@ -211,6 +212,44 @@ public class EntityHelper
         }
 
         return null;
+    }
+
+
+
+    /** yHeadRot in radians (legacy getRadRenderYawHead) */
+    public static float getRadRenderYawHead(Entity host)
+    {
+        if (host == null) return 0F;
+        return host instanceof LivingEntity le ?
+               (le.getYHeadRot() % 360F) * Values.N.DIV_PI_180 :
+               (host.getYRot() % 360F) * Values.N.DIV_PI_180;
+    }
+
+    /** body yaw (yBodyRot) or yRot in radians (legacy getRadRenderYawOffset) */
+    public static float getRadRenderYawOffset(Entity host)
+    {
+        if (host == null) return 0F;
+        return host instanceof LivingEntity le ?
+               (le.yBodyRot % 360F) * Values.N.DIV_PI_180 :
+               (host.getYRot() % 360F) * Values.N.DIV_PI_180;
+    }
+
+    /** xRot in radians (legacy getRadRenderPitch) */
+    public static float getRadRenderPitch(Entity host)
+    {
+        if (host == null) return 0F;
+        return host.getXRot() * Values.N.DIV_PI_180;
+    }
+
+
+
+    /** client-side player lookup by entity id (legacy getEntityPlayerByID client path) */
+    @Nullable
+    public static Player getPlayerByEntityID(Level level, int eid)
+    {
+        if (level == null || eid <= 0) return null;
+        Entity e = level.getEntity(eid);
+        return e instanceof Player ? (Player) e : null;
     }
 
 
