@@ -29,5 +29,17 @@ abstract public class BasicEntityShipCV extends BasicEntityShip
         return true;
     }
 
+    /** light aircraft count in inventory (legacy getNumAircraftLight) */
+    public int getNumAircraftLight()
+    {
+        return this.stateMinor()[com.lulan.shincolle.reference.ID.M.NumAirLight];
+    }
+
+    /** heavy aircraft count in inventory (legacy getNumAircraftHeavy) */
+    public int getNumAircraftHeavy()
+    {
+        return this.stateMinor()[com.lulan.shincolle.reference.ID.M.NumAirHeavy];
+    }
+
 
 }

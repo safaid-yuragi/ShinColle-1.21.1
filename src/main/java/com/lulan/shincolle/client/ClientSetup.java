@@ -25,6 +25,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -35,7 +36,8 @@ import net.neoforged.neoforge.registries.DeferredHolder;
  * renderers / layer definitions / particle providers / key mappings are
  * registered here.
  */
-@EventBusSubscriber(modid = Reference.MOD_ID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Reference.MOD_ID, value = Dist.CLIENT,
+    bus = EventBusSubscriber.Bus.MOD)
 public final class ClientSetup
 {
 
@@ -206,6 +208,13 @@ public final class ClientSetup
                     new com.lulan.shincolle.client.particle.ParticleSmoke(
                         level, x, y, z, xd, yd, zd, 1F, sprites);
             });
+    }
+
+    @SubscribeEvent
+    public static void registerKeyMappings(RegisterKeyMappingsEvent event)
+    {
+        event.register(ClientInputHandler.KEY_DEBUG_UNATK);
+        event.register(ClientInputHandler.KEY_DEBUG_UNATK_LIST);
     }
 
 

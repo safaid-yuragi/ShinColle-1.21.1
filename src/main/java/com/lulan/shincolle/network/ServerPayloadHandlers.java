@@ -7,6 +7,7 @@ import com.lulan.shincolle.entity.IShipGuardian;
 import com.lulan.shincolle.entity.IShipState;
 import com.lulan.shincolle.network.payload.MountMovePayload;
 import com.lulan.shincolle.network.payload.PairingPayload;
+import com.lulan.shincolle.network.payload.PointerItemPayload;
 import com.lulan.shincolle.network.payload.PlayerSkillPayload;
 import com.lulan.shincolle.network.payload.RidingRequestPayload;
 import com.lulan.shincolle.network.payload.ShipActionPayload;
@@ -153,6 +154,82 @@ public final class ServerPayloadHandlers
                 {
                     state.setStateFlag(flag, !state.getStateFlag(flag));
                 }
+            }
+            default -> {}
+            }
+        });
+    }
+
+    /**
+     * pointer item / OP tool key actions.
+     * (legacy C2SGUIPackets SetShipTeamID / SyncPlayerItem / SetUnatkClass /
+     * ShowUnatkClass)
+     */
+    public static void handlePointer(PointerItemPayload payload, IPayloadContext context)
+    {
+        context.enqueueWork(() ->
+        {
+            if (!(context.player() instanceof ServerPlayer player)) return;
+
+            switch (payload.action())
+            {
+            //set pointer team id (stored on the player's teitoku attachment)
+            case PointerItemPayload.ACT_SET_TEAM ->
+            {
+                if (payload.value2() >= 0 &&
+                    payload.value2() < player.getInventory().items.size())
+                {
+                    player.getInventory().selected = payload.value2();
+                }
+                player.getData(com.lulan.shincolle.registry.ModAttachments.TEITOKU)
+                    .putInt("PointerTeamID", payload.value());
+            }
+            //sync pointer mode to the held stack's component
+            case PointerItemPayload.ACT_SYNC_MODE ->
+            {
+                var stack = player.getMainHandItem();
+                if (stack.is(com.lulan.shincolle.registry.ModItems.POINTER_ITEM.get()))
+                {
+                    stack.set(com.lulan.shincolle.registry.ModComponents.POINTER_MODE.get(),
+                        payload.value());
+                }
+            }
+            //toggle unattackable entity class
+            case PointerItemPayload.ACT_SET_UNATK_CLASS ->
+            {
+                if (player.getServer() == null || payload.text().isEmpty()) return;
+                var data = com.lulan.shincolle.data.UnattackableClassData
+                    .get(player.getServer().overworld());
+                boolean added = data.toggle(payload.text());
+                player.displayClientMessage(
+                    net.minecraft.network.chat.Component.literal(
+                        (added ? "added unattackable class: " :
+                                 "removed unattackable class: ") + payload.text()), true);
+            }
+            //toggle the player's attack-target class (pointer GUI)
+            case PointerItemPayload.ACT_SET_TAR_CLASS ->
+            {
+                if (player.getServer() == null || payload.text().isEmpty()) return;
+                var data = com.lulan.shincolle.data.PlayerTargetClassData
+                    .get(player.getServer().overworld());
+                boolean added = data.toggle(payload.value(), payload.text());
+                player.displayClientMessage(
+                    net.minecraft.network.chat.Component.literal(
+                        (added ? "add " : "remove ") + payload.text() +
+                        (added ? " to" : " from") + " target list"), true);
+            }
+            //print unattackable class list
+            case PointerItemPayload.ACT_SHOW_UNATK_CLASS ->
+            {
+                if (player.getServer() == null) return;
+                var data = com.lulan.shincolle.data.UnattackableClassData
+                    .get(player.getServer().overworld());
+                player.sendSystemMessage(net.minecraft.network.chat.Component
+                    .translatable("chat.shincolle.optool.show")
+                    .withStyle(net.minecraft.ChatFormatting.GOLD));
+                data.getAll().forEach((k, v) -> player.sendSystemMessage(
+                    net.minecraft.network.chat.Component.literal(v)
+                        .withStyle(net.minecraft.ChatFormatting.AQUA)));
             }
             default -> {}
             }

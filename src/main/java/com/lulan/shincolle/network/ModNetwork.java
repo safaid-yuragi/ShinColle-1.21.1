@@ -8,6 +8,7 @@ import com.lulan.shincolle.network.payload.ParticleDataPayload;
 import com.lulan.shincolle.network.payload.EntityPosRotPayload;
 import com.lulan.shincolle.network.payload.PairingPayload;
 import com.lulan.shincolle.network.payload.PlayerSkillPayload;
+import com.lulan.shincolle.network.payload.PointerItemPayload;
 import com.lulan.shincolle.network.payload.RidingRequestPayload;
 import com.lulan.shincolle.network.payload.ShipActionPayload;
 import com.lulan.shincolle.network.payload.ShipSyncPayload;
@@ -59,6 +60,8 @@ public final class ModNetwork
             ServerPayloadHandlers::handleShipAction);
         registrar.playToServer(MountMovePayload.TYPE, MountMovePayload.STREAM_CODEC,
             ServerPayloadHandlers::handleMountMove);
+        registrar.playToServer(PointerItemPayload.TYPE, PointerItemPayload.STREAM_CODEC,
+            ServerPayloadHandlers::handlePointer);
     }
 
     /* ==================== send helpers ==================== */

@@ -6,6 +6,8 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
 import com.lulan.shincolle.config.ShinColleConfig;
+import com.lulan.shincolle.data.PlayerTargetClassData;
+import com.lulan.shincolle.data.UnattackableClassData;
 import com.lulan.shincolle.entity.BasicEntityAirplane;
 import com.lulan.shincolle.entity.BasicEntityMount;
 import com.lulan.shincolle.entity.BasicEntityShip;
@@ -18,8 +20,10 @@ import com.lulan.shincolle.reference.ID;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Slime;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 
 /**
@@ -147,7 +151,8 @@ public class TargetHelper
                 return true;
             }
 
-            return false;
+            //player-defined target classes (including pet check)
+            return checkAttackTargetList(this.host, target);
         }
     }
 
@@ -295,8 +300,50 @@ public class TargetHelper
     /** invulnerable entities ships must not target */
     public static boolean isEntityInvulnerable(Entity target)
     {
-        return target.isInvulnerable() ||
-               (target instanceof Player p && (p.isCreative() || p.isSpectator()));
+        if (target.isInvulnerable() ||
+            (target instanceof Player p && (p.isCreative() || p.isSpectator())))
+        {
+            return true;
+        }
+
+        //unattackable class list (server side only)
+        if (!target.level().isClientSide() &&
+            target.level() instanceof ServerLevel level)
+        {
+            return UnattackableClassData.get(
+                level.getServer().overworld()).contains(target.getClass());
+        }
+
+        return false;
+    }
+
+    /**
+     * check target is in the host-owner's attack target class list
+     * (legacy checkAttackTargetList), SERVER SIDE only.
+     */
+    public static boolean checkAttackTargetList(Entity host, Entity target)
+    {
+        if (target == null || !(host instanceof IShipAttackBase attacker)) return false;
+        if (target.level().isClientSide() ||
+            !(target.level() instanceof ServerLevel level) ||
+            level.getServer() == null) return false;
+
+        var tarList = PlayerTargetClassData
+            .get(level.getServer().overworld()).get(attacker.getPlayerUID());
+        if (tarList == null) return false;
+
+        if (!tarList.containsKey(target.getClass().getSimpleName().hashCode()))
+        {
+            return false;
+        }
+
+        //tameable entity: attack only when not same owner
+        if (target instanceof OwnableEntity)
+        {
+            return !TeamHelper.checkSameOwner(host, target);
+        }
+
+        return true;
     }
 
     /** per-tick target cleanup (legacy updateTarget) */

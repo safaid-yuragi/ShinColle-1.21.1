@@ -43,6 +43,21 @@ public final class ModComponents
             .build());
 
 
+    /** pointer item mode (legacy meta: 0-2 normal, 3-5 magnifier/caress) */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> POINTER_MODE =
+        COMPONENTS.register("pointer_mode", () -> DataComponentType.<Integer>builder()
+            .persistent(Codec.INT)
+            .networkSynchronized(ByteBufCodecs.INT)
+            .build());
+
+    /** entity uid bound to the pointer item */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> POINTER_UID =
+        COMPONENTS.register("pointer_uid", () -> DataComponentType.<Integer>builder()
+            .persistent(Codec.INT)
+            .networkSynchronized(ByteBufCodecs.INT)
+            .build());
+
+
     private ModComponents() {}
 
 }
