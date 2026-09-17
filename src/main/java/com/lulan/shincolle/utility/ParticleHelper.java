@@ -112,6 +112,41 @@ public class ParticleHelper
         sl.sendParticles(p, x, y, z, count, 0.1D * scale, 0.1D * scale, 0.1D * scale, 0.02D);
     }
 
+    /**
+     * emotion icon over an entity (legacy S2CSpawnParticle type 36:
+     * EMOTION_ENTITY ParticleData with floats={x,y,z,height},
+     * ints={entityId, hostType, emotes}, bools={isMorph}).
+     */
+    public static void spawnEmotionParticle(Entity host, float height,
+            int emotes)
+    {
+        if (!(host.level() instanceof ServerLevel sl)) return;
+
+        ParticleData data = new ParticleData(ParType.EMOTION_ENTITY);
+        data.setBooleanData(false);
+        data.setFloatData((float) host.getX());
+        data.setFloatData((float) host.getY());
+        data.setFloatData((float) host.getZ());
+        data.setFloatData(height);
+        data.setIntData(host.getId());
+        data.setIntData(0);        //host type
+        data.setIntData(emotes);   //emotion type
+
+        ModNetwork.sendParticleData(sl, host.getX(), host.getY(),
+            host.getZ(), data);
+    }
+
+    /**
+     * rising bubbles at a position (legacy spawnAttackParticleAt type 37:
+     * volcano core bubbles).
+     */
+    public static void spawnBubbleAt(ServerLevel level, double x, double y,
+            double z, double mx, double my, double mz)
+    {
+        level.sendParticles(ParticleTypes.BUBBLE_COLUMN_UP, x, y, z, 1,
+            mx, my, mz, 0.02D);
+    }
+
     /** particle burst on entity (muzzle flash equivalent) */
     public static void spawnAttackParticleAtEntity(Entity target, double scale,
             double ox, double oy, int type)

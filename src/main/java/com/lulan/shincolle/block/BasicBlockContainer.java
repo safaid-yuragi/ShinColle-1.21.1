@@ -9,6 +9,8 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
@@ -27,6 +29,18 @@ abstract public class BasicBlockContainer extends BasicBlock implements EntityBl
     @Nullable
     @Override
     public abstract BlockEntity newBlockEntity(BlockPos pos, BlockState state);
+
+    /** legacy ITickable: route server ticks to BasicBlockEntity.tick() */
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, BlockEntityType<T> type)
+    {
+        return (lvl, p, st, be) ->
+        {
+            if (be instanceof BasicBlockEntity tile) tile.tick();
+        };
+    }
 
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState,

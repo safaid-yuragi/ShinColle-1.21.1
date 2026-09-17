@@ -78,5 +78,26 @@ public class BlockHelper
         return !state.getFluidState().isEmpty();
     }
 
+    /** any liquid block inside the cube around pos (legacy checkBlockNearbyIsLiquid) */
+    public static boolean checkBlockNearbyIsLiquid(Level level, BlockPos pos, int range)
+    {
+        for (int ix = -range; ix <= range; ix++)
+        {
+            for (int iy = -range; iy <= range; iy++)
+            {
+                for (int iz = -range; iz <= range; iz++)
+                {
+                    if (checkBlockIsLiquid(
+                        level.getBlockState(pos.offset(ix, iy, iz))))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
 
 }

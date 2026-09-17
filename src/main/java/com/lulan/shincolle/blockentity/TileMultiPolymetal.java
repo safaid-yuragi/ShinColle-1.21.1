@@ -6,9 +6,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * port of legacy TileMultiPolymetal. Full machine logic is ported in Phase 5.
+ * port of legacy TileMultiPolymetal (large shipyard slave part).
  */
-public class TileMultiPolymetal extends BasicBlockEntity
+public class TileMultiPolymetal extends BasicMultiBlockEntity
 {
 
 

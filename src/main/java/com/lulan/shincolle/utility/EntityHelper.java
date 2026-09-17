@@ -109,6 +109,28 @@ public class EntityHelper
         return ent.isInWater() || ent.isInLava();
     }
 
+    /** ship is out of combat for a while (legacy checkShipOutOfCombat) */
+    public static boolean checkShipOutOfCombat(BasicEntityShip ship)
+    {
+        return ship != null &&
+               ship.tickCount - ship.getLastCombatTick() > 128;
+    }
+
+    /**
+     * show an emotion icon over every entity in the list
+     * (legacy applyEmotesAOE: S2CSpawnParticle type 36 per entity).
+     */
+    public static void applyEmotesAOE(List<? extends Entity> entlist, int emotes)
+    {
+        if (entlist == null || entlist.isEmpty()) return;
+
+        for (Entity ent : entlist)
+        {
+            ParticleHelper.spawnEmotionParticle(ent,
+                ent.getBbHeight() * 0.6F, emotes);
+        }
+    }
+
     /**
      * liquid depth measured from entity feet to fluid surface
      * (legacy getEntityDepth: scans upward for non-liquid block).
