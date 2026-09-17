@@ -26,7 +26,10 @@ public final class ModTabs
         java.util.List<Short> ids = new java.util.ArrayList<>();
         for (short id : ShipClassRegistry.allClassIds())
         {
-            if (id >= 0 && id < ShipClassRegistry.MOB_OFFSET) ids.add(id);
+            //only normal ships whose entity type is actually registered
+            //(unregistered classes resolve to nothing and would not spawn)
+            if (id >= 0 && id < ShipClassRegistry.MOB_OFFSET &&
+                ShipClassRegistry.entityTypeOf(id) != null) ids.add(id);
         }
         short[] arr = new short[ids.size()];
         for (int i = 0; i < arr.length; i++) arr[i] = ids.get(i);

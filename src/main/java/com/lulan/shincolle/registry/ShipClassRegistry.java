@@ -266,11 +266,14 @@ public final class ShipClassRegistry
         return classIdOf(loc.getPath());
     }
 
-    /** ship class id -> registered EntityType (Phase 2+), null before registration */
+    /** ship class id -> registered EntityType (Phase 2+), null if unmapped or
+     *  the entity type is not registered. NOTE: ENTITY_TYPE is a defaulted
+     *  registry whose default is "minecraft:pig" — plain get() returns a PIG
+     *  for unregistered names, so use getOptional() which bypasses the default. */
     public static EntityType<?> entityTypeOf(short classId)
     {
         ResourceLocation id = idOf(classId);
-        return id == null ? null : BuiltInRegistries.ENTITY_TYPE.get(id);
+        return id == null ? null : BuiltInRegistries.ENTITY_TYPE.getOptional(id).orElse(null);
     }
 
     /** ship class id -> legacy entity class simple name, null if unmapped */

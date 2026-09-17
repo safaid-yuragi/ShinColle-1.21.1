@@ -19,6 +19,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityDimensions;
@@ -46,7 +47,7 @@ import net.minecraft.world.phys.AABB;
  * (0:small mob, 1:large mob, 2:boss small, 3:boss large) that drives
  * size, attrs and egg drop chance.
  */
-abstract public class BasicEntityShipHostile extends Monster implements IShipState
+abstract public class BasicEntityShipHostile extends Monster implements IShipEmotion
 {
 
     protected static final EntityDataAccessor<Integer> DATA_FLAGS =
@@ -218,6 +219,65 @@ abstract public class BasicEntityShipHostile extends Monster implements IShipSta
         {
             this.bossInfo.setName(this.getDisplayName());
         }
+    }
+
+    /* ==================== IShipEmotion ==================== */
+
+    @Override
+    public int getTickExisted()
+    {
+        return this.tickCount;
+    }
+
+    @Override
+    public RandomSource getRand()
+    {
+        return this.random;
+    }
+
+    @Override
+    public boolean getIsRiding()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean getIsSitting()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean getIsSneaking()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean getIsLeashed()
+    {
+        return this.isLeashed();
+    }
+
+    @Override
+    public void setEntitySit(boolean sit) {}
+
+    @Override
+    public double getShipDepth(int type)
+    {
+        return 0D;
+    }
+
+    @Override
+    public float getModelRotate(int index)
+    {
+        return this.rotateAngle[index < 0 ? 0 : (index > 2 ? 2 : index)];
+    }
+
+    @Override
+    public void setModelRotate(int index, float value)
+    {
+        this.rotateAngle[index < 0 ? 0 : (index > 2 ? 2 : index)] = value;
     }
 
     /** recalc attrs for current scale level */

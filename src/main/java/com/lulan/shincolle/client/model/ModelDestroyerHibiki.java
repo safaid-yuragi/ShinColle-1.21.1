@@ -680,7 +680,7 @@ this.animTransX += (0F); this.animTransY += (0.05F); this.animTransZ += (0F);
 		    addk2 -= 0.55F;
   		}//end if sneaking
 	    
-	    if (((IShipRiderType) ent).getRiderType() > 0)
+	    if (ent instanceof IShipRiderType rider && rider.getRiderType() > 0)
 	  	{
     		//Body
 		  	this.Butt.xRot = -0.2F;
@@ -726,7 +726,7 @@ this.animTransX += (0F); this.animTransY += (0.21F); this.animTransZ += (0F);
 			  	this.ArmRight02.xRot = 0F;
 	    	}
 	    	
-	    	if (((IShipRiderType) ent).getRiderType() > 1)
+	    	if (ent instanceof IShipRiderType rider2 && rider2.getRiderType() > 1)
 	    	{
 	    		//body
 		  		this.Head.yRot *= 0.5F;
