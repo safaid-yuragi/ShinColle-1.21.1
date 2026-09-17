@@ -3,6 +3,7 @@ package com.lulan.shincolle.ai;
 import java.util.EnumSet;
 
 import com.lulan.shincolle.entity.IShipAttackBase;
+import com.lulan.shincolle.reference.ID;
 import com.lulan.shincolle.utility.CombatHelper;
 
 import net.minecraft.world.InteractionHand;
@@ -36,7 +37,8 @@ public class ShipAttackOnCollideGoal extends Goal
     @Override
     public boolean canUse()
     {
-        if (this.host2.isPassenger() || this.host.getIsSitting())
+        if (this.host2.isPassenger() || this.host.getIsSitting() ||
+            !this.host.getStateFlag(ID.F.UseMelee))
         {
             return false;
         }

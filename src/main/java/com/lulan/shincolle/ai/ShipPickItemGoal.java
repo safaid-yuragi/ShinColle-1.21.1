@@ -66,8 +66,6 @@ public class ShipPickItemGoal extends Goal
             this.hostMount = null;
             this.targetSorter = new TargetHelper.Sorter((Entity) entity);
         }
-
-        updateShipParms();
     }
 
     @Override

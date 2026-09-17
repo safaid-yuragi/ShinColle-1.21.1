@@ -87,11 +87,6 @@ public class ShipGuardingGoal extends Goal
             }
         }
 
-        if (entity instanceof BasicEntityShip || entity instanceof BasicEntityMount)
-        {
-            this.owner = EntityHelper.getEntityPlayerByUID((Entity) entity, entity.getPlayerUID());
-        }
-
         this.pos = new double[] {-1D, -1D, -1D};
         this.guardPosOld = new double[] {-1D, -100D, -1D};
     }
@@ -446,10 +441,14 @@ public class ShipGuardingGoal extends Goal
 
     private void drawGuardParticle()
     {
-        if (this.owner instanceof ServerPlayer &&
+        //resolved lazily: entity state arrays are not initialized during registerGoals
+        Player owner = EntityHelper.getEntityPlayerByUID(this.host2, this.host.getPlayerUID());
+        this.owner = owner;
+
+        if (owner instanceof ServerPlayer &&
             (ShinColleConfig.alwaysShowTeamParticle ||
-             EntityHelper.getPointerInUse(this.owner) != null) &&
-            this.owner.level().dimension() == this.host2.level().dimension() &&
+             EntityHelper.getPointerInUse(owner) != null) &&
+            owner.level().dimension() == this.host2.level().dimension() &&
             this.host2.level() instanceof ServerLevel sl)
         {
             ParticleHelper.spawnWaypointMarker(sl, this.pos[0], this.pos[1], this.pos[2]);

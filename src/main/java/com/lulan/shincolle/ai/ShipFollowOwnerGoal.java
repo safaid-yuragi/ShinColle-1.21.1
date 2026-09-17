@@ -54,12 +54,6 @@ public class ShipFollowOwnerGoal extends Goal
 
         this.pos = new double[] {host2.getX(), host2.getY(), host2.getZ()};
         this.ownerPosOld = new double[] {host2.getX(), host2.getY(), host2.getZ()};
-
-        if (entity instanceof BasicEntityShip || entity instanceof BasicEntityMount)
-        {
-            this.player = EntityHelper.getEntityPlayerByUID(
-                (net.minecraft.world.entity.Entity) entity, entity.getPlayerUID());
-        }
     }
 
     @Override
@@ -270,10 +264,14 @@ public class ShipFollowOwnerGoal extends Goal
     /** formation move marker particle (legacy S2CSpawnParticle type 25) */
     private void drawFormationParticle(int count)
     {
-        if (this.player instanceof ServerPlayer sp &&
+        //resolved lazily: entity state arrays are not initialized during registerGoals
+        Player player = EntityHelper.getEntityPlayerByUID(this.host2, this.host.getPlayerUID());
+        this.player = player;
+
+        if (player instanceof ServerPlayer sp &&
             (ShinColleConfig.alwaysShowTeamParticle ||
-             EntityHelper.getPointerInUse(this.player) != null) &&
-            this.player.level().dimension() == this.host2.level().dimension() &&
+             EntityHelper.getPointerInUse(player) != null) &&
+            player.level().dimension() == this.host2.level().dimension() &&
             this.host2.level() instanceof ServerLevel sl)
         {
             ParticleHelper.spawnWaypointMarker(sl, this.pos[0], this.pos[1], this.pos[2]);

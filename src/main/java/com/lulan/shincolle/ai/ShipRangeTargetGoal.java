@@ -73,8 +73,6 @@ public class ShipRangeTargetGoal extends Goal
             this.hostShip = null;
             this.targetSelector = new TargetHelper.Selector((Entity) host);
         }
-
-        updateRange();
     }
 
     @Override

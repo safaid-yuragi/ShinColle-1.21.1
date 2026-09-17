@@ -423,10 +423,7 @@ abstract public class BasicEntityShip extends TamableAnimal implements IShipGuar
         this.goalSelector.addGoal(11, new com.lulan.shincolle.ai.ShipPickItemGoal(this, 6F));
         this.goalSelector.addGoal(12, new com.lulan.shincolle.ai.ShipRangeAttackGoal(this));
         this.goalSelector.addGoal(13, new com.lulan.shincolle.ai.ShipSkillAttackGoal(this));
-        if (this.getStateFlag(ID.F.UseMelee))
-        {
-            this.goalSelector.addGoal(15, new com.lulan.shincolle.ai.ShipAttackOnCollideGoal(this, 1D));
-        }
+        this.goalSelector.addGoal(15, new com.lulan.shincolle.ai.ShipAttackOnCollideGoal(this, 1D));
         this.goalSelector.addGoal(23, new com.lulan.shincolle.ai.ShipFloatingGoal(this));
         this.goalSelector.addGoal(24, new com.lulan.shincolle.ai.ShipWanderGoal(this, 10, 5, 0.8D));
         this.goalSelector.addGoal(25, new com.lulan.shincolle.ai.ShipWatchClosestGoal(this, Player.class, 4F, 0.06F));
