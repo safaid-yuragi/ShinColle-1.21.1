@@ -68,7 +68,9 @@ public final class ModItems
     public static final DeferredItem<BasicItem> OWNER_PAPER = item("owner_paper");
     public static final DeferredItem<BasicItem> OP_TOOL = item("op_tool");
     public static final DeferredItem<BasicItem> POINTER_ITEM = item("pointer_item");
-    public static final DeferredItem<BasicItem> RECIPE_PAPER = item("recipe_paper");
+    public static final DeferredItem<com.lulan.shincolle.item.RecipePaperItem> RECIPE_PAPER =
+        registerAll("recipe_paper",
+            () -> new com.lulan.shincolle.item.RecipePaperItem(new Item.Properties()));
     public static final DeferredItem<BasicItem> REPAIR_GODDESS = item("repair_goddess");
     public static final DeferredItem<BasicItem> TARGET_WRENCH = item("target_wrench");
     public static final DeferredItem<BasicItem> TRAINING_BOOK = item("training_book");
@@ -171,6 +173,14 @@ public final class ModItems
     private static DeferredItem<BasicItem> item(String name)
     {
         DeferredItem<BasicItem> h = ITEMS.register(name, () -> new BasicItem(new Item.Properties()));
+        ALL_ITEMS.add(h);
+        return h;
+    }
+
+    private static <T extends Item> DeferredItem<T> registerAll(String name,
+            java.util.function.Supplier<T> sup)
+    {
+        DeferredItem<T> h = ITEMS.register(name, sup);
         ALL_ITEMS.add(h);
         return h;
     }

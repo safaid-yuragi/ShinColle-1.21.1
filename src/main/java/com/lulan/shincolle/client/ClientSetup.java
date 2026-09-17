@@ -234,6 +234,12 @@ public final class ClientSetup
             com.lulan.shincolle.client.gui.screen.CraneScreen::new);
         event.register(com.lulan.shincolle.registry.ModMenus.DESK.get(),
             com.lulan.shincolle.client.gui.screen.DeskScreen::new);
+        event.register(com.lulan.shincolle.registry.ModMenus.RECIPE_PAPER.get(),
+            com.lulan.shincolle.client.gui.screen.RecipePaperScreen::new);
+        event.register(com.lulan.shincolle.registry.ModMenus.FORMATION.get(),
+            com.lulan.shincolle.client.gui.screen.FormationScreen::new);
+        event.register(com.lulan.shincolle.registry.ModMenus.MORPH_INVENTORY.get(),
+            com.lulan.shincolle.client.gui.screen.MorphInventoryScreen::new);
     }
 
 

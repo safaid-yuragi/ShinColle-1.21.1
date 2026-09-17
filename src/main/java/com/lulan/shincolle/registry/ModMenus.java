@@ -2,7 +2,10 @@ package com.lulan.shincolle.registry;
 
 import com.lulan.shincolle.menu.CraneMenu;
 import com.lulan.shincolle.menu.DeskMenu;
+import com.lulan.shincolle.menu.FormationMenu;
 import com.lulan.shincolle.menu.LargeShipyardMenu;
+import com.lulan.shincolle.menu.MorphInventoryMenu;
+import com.lulan.shincolle.menu.RecipePaperMenu;
 import com.lulan.shincolle.menu.ShipInventoryMenu;
 import com.lulan.shincolle.menu.SmallShipyardMenu;
 import com.lulan.shincolle.menu.VolCoreMenu;
@@ -48,6 +51,20 @@ public final class ModMenus
     public static final DeferredHolder<MenuType<?>, MenuType<DeskMenu>> DESK =
         MENUS.register("desk", () ->
             IMenuTypeExtension.create(DeskMenu::new));
+
+    /* item/standalone menus: opened via openMenu; buf unused/empty */
+    public static final DeferredHolder<MenuType<?>, MenuType<RecipePaperMenu>> RECIPE_PAPER =
+        MENUS.register("recipe_paper", () ->
+            IMenuTypeExtension.create(RecipePaperMenu::new));
+
+    public static final DeferredHolder<MenuType<?>, MenuType<FormationMenu>> FORMATION =
+        MENUS.register("formation", () ->
+            IMenuTypeExtension.create(FormationMenu::new));
+
+    /** morph inventory (entity id sent in open buffer; equip slots on player) */
+    public static final DeferredHolder<MenuType<?>, MenuType<MorphInventoryMenu>> MORPH_INVENTORY =
+        MENUS.register("morph_inventory", () ->
+            IMenuTypeExtension.create(MorphInventoryMenu::new));
 
 
     private ModMenus() {}
