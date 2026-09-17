@@ -1,0 +1,62 @@
+{
+  "type": "shincolle:chest_loot",
+  "conditions": [
+    {
+      "condition": "neoforge:loot_table_id",
+      "loot_table_id": "minecraft:chests/spawn_bonus_chest"
+    }
+  ],
+  "pool": {
+    "rolls": {
+      "type": "minecraft:uniform",
+      "min": 1,
+      "max": 2
+    },
+    "bonus_rolls": 1,
+    "entries": [
+      {
+        "type": "minecraft:item",
+        "name": "shincolle:grudge",
+        "weight": 1,
+        "functions": [
+          {
+            "function": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 10,
+              "max": 15
+            }
+          }
+        ]
+      },
+      {
+        "type": "minecraft:item",
+        "name": "shincolle:ship_spawn_egg",
+        "functions": [
+          {
+            "function": "minecraft:set_components",
+            "components": {
+              "shincolle:ship_class": 2
+            }
+          }
+        ],
+        "weight": 2
+      },
+      {
+        "type": "minecraft:item",
+        "name": "shincolle:ammo",
+        "weight": 1,
+        "functions": [
+          {
+            "function": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 5,
+              "max": 8
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

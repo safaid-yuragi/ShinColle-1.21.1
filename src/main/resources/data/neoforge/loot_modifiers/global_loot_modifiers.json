@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "entries": [
+    "shincolle:spawn_bonus_chest",
+    "shincolle:igloo_chest",
+    "shincolle:simple_dungeon",
+    "shincolle:village_weaponsmith",
+    "shincolle:abandoned_mineshaft",
+    "shincolle:desert_pyramid",
+    "shincolle:jungle_temple",
+    "shincolle:nether_bridge",
+    "shincolle:stronghold_library",
+    "shincolle:stronghold_crossing",
+    "shincolle:stronghold_corridor",
+    "shincolle:end_city_treasure"
+  ],
+  "remove": []
+}
