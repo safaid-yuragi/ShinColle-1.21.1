@@ -3,6 +3,7 @@ package com.lulan.shincolle.network;
 import com.lulan.shincolle.client.ClientPayloadHandlers;
 import com.lulan.shincolle.entity.IShipState;
 import com.lulan.shincolle.network.payload.EntityMotionPayload;
+import com.lulan.shincolle.network.payload.GuiButtonPayload;
 import com.lulan.shincolle.network.payload.MountMovePayload;
 import com.lulan.shincolle.network.payload.ParticleDataPayload;
 import com.lulan.shincolle.network.payload.EntityPosRotPayload;
@@ -62,6 +63,8 @@ public final class ModNetwork
             ServerPayloadHandlers::handleMountMove);
         registrar.playToServer(PointerItemPayload.TYPE, PointerItemPayload.STREAM_CODEC,
             ServerPayloadHandlers::handlePointer);
+        registrar.playToServer(GuiButtonPayload.TYPE, GuiButtonPayload.STREAM_CODEC,
+            ServerPayloadHandlers::handleGuiButton);
     }
 
     /* ==================== send helpers ==================== */

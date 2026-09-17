@@ -5,6 +5,7 @@ import com.lulan.shincolle.entity.BasicEntityMount;
 import com.lulan.shincolle.entity.BasicEntityShip;
 import com.lulan.shincolle.entity.IShipGuardian;
 import com.lulan.shincolle.entity.IShipState;
+import com.lulan.shincolle.network.payload.GuiButtonPayload;
 import com.lulan.shincolle.network.payload.MountMovePayload;
 import com.lulan.shincolle.network.payload.PairingPayload;
 import com.lulan.shincolle.network.payload.PointerItemPayload;
@@ -232,6 +233,41 @@ public final class ServerPayloadHandlers
                         .withStyle(net.minecraft.ChatFormatting.AQUA)));
             }
             default -> {}
+            }
+        });
+    }
+
+
+    /** GUI button click (legacy C2SGUIPackets ShipBtn/TileBtn/MorphBtn) */
+    public static void handleGuiButton(GuiButtonPayload payload, IPayloadContext context)
+    {
+        context.enqueueWork(() ->
+        {
+            if (!(context.player() instanceof ServerPlayer player)) return;
+
+            switch (payload.channel())
+            {
+            case GuiButtonPayload.CH_SHIP:
+            case GuiButtonPayload.CH_MORPH:
+            case GuiButtonPayload.CH_MORPH2:
+            {
+                Entity e = player.level().getEntity(payload.entityId());
+                if (e instanceof BasicEntityShip ship)
+                    com.lulan.shincolle.utility.GuiButtonHelper
+                        .setEntityByGUI(ship, payload.button(), payload.value());
+            }
+            break;
+            case GuiButtonPayload.CH_TILE:
+            {
+                var be = player.level().getBlockEntity(payload.getPos());
+                if (be instanceof com.lulan.shincolle.blockentity.BasicBlockEntity tile)
+                    com.lulan.shincolle.utility.GuiButtonHelper
+                        .setTileEntityByGUI(tile, payload.button(),
+                            payload.value(), payload.value2());
+            }
+            break;
+            default:
+                break;
             }
         });
     }

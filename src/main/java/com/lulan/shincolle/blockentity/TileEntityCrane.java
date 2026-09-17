@@ -12,10 +12,24 @@ public class TileEntityCrane extends BasicBlockEntity
 {
 
 
+    /** ship entity held by the crane arm (cleared on power off) */
+    private net.minecraft.world.entity.Entity ship;
+
+
     public TileEntityCrane(BlockPos pos, BlockState state)
     {
         super(ModBlockEntities.TILEENTITYCRANE.get(), pos, state, 18);
         this.fields = new int[14];
+    }
+
+    public net.minecraft.world.entity.Entity getShip()
+    {
+        return this.ship;
+    }
+
+    public void setShip(net.minecraft.world.entity.Entity ship)
+    {
+        this.ship = ship;
     }
 
 

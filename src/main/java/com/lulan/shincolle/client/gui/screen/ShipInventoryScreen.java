@@ -2,6 +2,7 @@ package com.lulan.shincolle.client.gui.screen;
 
 import com.lulan.shincolle.entity.BasicEntityShip;
 import com.lulan.shincolle.menu.ShipInventoryMenu;
+import com.lulan.shincolle.reference.ID;
 import com.lulan.shincolle.reference.Reference;
 
 import net.minecraft.client.gui.GuiGraphics;
@@ -45,6 +46,14 @@ public class ShipInventoryScreen extends AbstractContainerScreen<ShipInventoryMe
         this.addRenderableWidget(Button.builder(Component.literal(">"),
                 b -> this.sendButton(1))
             .bounds(this.leftPos + 135, this.topPos + 124, 12, 12).build());
+
+        //state toggle buttons (legacy ID.B.ShipInv_*): send GuiButtonPayload
+        this.addRenderableWidget(Button.builder(Component.literal("Melee"),
+                b -> this.sendShipButton(ID.B.ShipInv_Melee, toggle(ID.F.UseMelee)))
+            .bounds(this.leftPos + 8, this.topPos + 140, 40, 12).build());
+        this.addRenderableWidget(Button.builder(Component.literal("Passive"),
+                b -> this.sendShipButton(ID.B.ShipInv_TarAI, toggle(ID.F.PassiveAI)))
+            .bounds(this.leftPos + 50, this.topPos + 140, 40, 12).build());
     }
 
     private void sendButton(int id)
@@ -53,6 +62,42 @@ public class ShipInventoryScreen extends AbstractContainerScreen<ShipInventoryMe
         {
             this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, id);
         }
+    }
+
+    /** send a ship-GUI button to the server (legacy C2SGUIPackets ShipBtn) */
+    private void sendShipButton(int buttonId, int value)
+    {
+        if (this.entity != null)
+        {
+            net.neoforged.neoforge.network.PacketDistributor.sendToServer(
+                com.lulan.shincolle.network.payload.GuiButtonPayload.entity(
+                    com.lulan.shincolle.network.payload.GuiButtonPayload.CH_SHIP,
+                    this.entity.getId(), buttonId, value));
+        }
+    }
+
+    /** toggle a synced flag field -> next value to send */
+    private int toggle(int flagId)
+    {
+        return this.menu.getField(fieldForFlag(flagId)) == 0 ? 1 : 0;
+    }
+
+    /** map ID.F flag -> its synced GUI field index */
+    private static int fieldForFlag(int flagId)
+    {
+        //fields 5-10 = UseMelee..IsMarried; 14-20 = PassiveAI..TimeKeeper; etc.
+        return switch (flagId)
+        {
+        case ID.F.UseMelee -> 5;  case ID.F.UseAmmoLight -> 6;
+        case ID.F.UseAmmoHeavy -> 7; case ID.F.UseAirLight -> 8;
+        case ID.F.UseAirHeavy -> 9;  case ID.F.IsMarried -> 10;
+        case ID.F.PassiveAI -> 14;   case ID.F.UseRingEffect -> 15;
+        case ID.F.OnSightChase -> 16; case ID.F.PVPFirst -> 17;
+        case ID.F.AntiAir -> 18;     case ID.F.AntiSS -> 19;
+        case ID.F.TimeKeeper -> 20;  case ID.F.PickItem -> 23;
+        case ID.F.ShowHeldItem -> 28; case ID.F.AutoPump -> 30;
+        default -> -1;
+        };
     }
 
     @Override

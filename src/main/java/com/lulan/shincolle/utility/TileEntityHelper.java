@@ -163,5 +163,41 @@ public class TileEntityHelper
                stack.getCapability(Capabilities.FluidHandler.ITEM) != null;
     }
 
+    /**
+     * large shipyard material inc/dec (legacy setLargeShipyardBuildMats).
+     * value: 0-3 = stock->build (+1000/+100/+10/+1), 4-7 = build->stock.
+     */
+    public static void setLargeShipyardBuildMats(
+            com.lulan.shincolle.blockentity.TileMultiGrudgeHeavy tile,
+            int matType, int value)
+    {
+        if (tile == null) return;
+
+        int num;
+        switch (value)
+        {
+        case 0: case 4: num = 1000; break;
+        case 1: case 5: num = 100;  break;
+        case 2: case 6: num = 10;   break;
+        case 3: case 7: default: num = 1; break;
+        }
+
+        if (value <= 3)
+        {
+            //matStock -> matBuild
+            if (num > tile.getMatStock(matType)) num = tile.getMatStock(matType);
+            if (num + tile.getMatBuild(matType) > 1000) num = 1000 - tile.getMatBuild(matType);
+            tile.addMatStock(matType, -num);
+            tile.addMatBuild(matType, num);
+        }
+        else
+        {
+            //matBuild -> matStock
+            if (num > tile.getMatBuild(matType)) num = tile.getMatBuild(matType);
+            tile.addMatBuild(matType, -num);
+            tile.addMatStock(matType, num);
+        }
+    }
+
 
 }
