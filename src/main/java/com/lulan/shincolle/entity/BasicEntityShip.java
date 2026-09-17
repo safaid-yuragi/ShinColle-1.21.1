@@ -6,7 +6,11 @@ import javax.annotation.Nullable;
 
 import com.lulan.shincolle.config.ShinColleConfig;
 import com.lulan.shincolle.reference.ID;
+import com.lulan.shincolle.ai.path.ShipMoveControl;
+import com.lulan.shincolle.ai.path.ShipPathNavigation;
+import com.lulan.shincolle.reference.dataclass.Attrs;
 import com.lulan.shincolle.reference.dataclass.AttrsAdv;
+import com.lulan.shincolle.reference.dataclass.MissileData;
 import com.lulan.shincolle.registry.ModItems;
 import com.lulan.shincolle.registry.ModSounds;
 import com.lulan.shincolle.utility.BuffHelper;
@@ -28,6 +32,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -39,7 +44,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.items.ItemStackHandler;
+import java.util.HashMap;
+import java.util.Random;
 
 /**
  * ship entity base class (player-owned ships).
@@ -48,7 +57,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * NBT save/load, sit/follow, interact basics, death -> spawn egg drop.
  * Combat, AI goals, emotion visuals and GUI are wired in Phase 4+.
  */
-abstract public class BasicEntityShip extends TamableAnimal implements IShipState
+abstract public class BasicEntityShip extends TamableAnimal implements IShipGuardian, IShipCannonAttack, IFloatingEntity
 {
 
     /** packed flag bitmask + full state tag for client sync */
@@ -93,6 +102,39 @@ abstract public class BasicEntityShip extends TamableAnimal implements IShipStat
     /** GUI/rendering: rotates with body for models (Phase 7) */
     public float[] rotateAngle = new float[3];
 
+    /** ship path navigation (created in createNavigation) */
+    protected ShipPathNavigation shipNavigate;
+
+    /** attack target / revenge target (server side entity refs) */
+    @Nullable
+    protected Entity entityTarget;
+    @Nullable
+    protected Entity revengeTarget;
+    protected int revengeTime = 0;
+
+    /** guarded entity ref + last waypoint */
+    @Nullable
+    protected Entity guardedEntity;
+    protected net.minecraft.core.BlockPos lastWaypoint = net.minecraft.core.BlockPos.ZERO;
+
+    /** liquid depth for floating AI */
+    protected double entityDepth = 0D;
+    protected double entityFloatingDepth = 0D;
+
+    /** buffs on self: potion id -> level; effects on hit: potion id -> {amp, ticks, chance%} */
+    protected HashMap<Integer, Integer> buffMap = new HashMap<>();
+    protected HashMap<Integer, int[]> attackEffectMap = new HashMap<>();
+
+    /** missile params per attack type: 0 melee 1 light 2 heavy 3 air light 4 air heavy */
+    protected MissileData[] missileData = new MissileData[5];
+
+    /** fishing hook entity for fishing task */
+    @Nullable
+    public EntityShipFishingHook fishHook;
+
+    /** model scale level (morph display) */
+    protected int scaleLevel = 0;
+
 
     public BasicEntityShip(EntityType<? extends BasicEntityShip> type, Level level)
     {
@@ -118,6 +160,8 @@ abstract public class BasicEntityShip extends TamableAnimal implements IShipStat
         this.StateMinor[ID.M.GuardDim] = 0;
 
         this.shipAttrs = new AttrsAdv(this.getShipClassID());
+
+        for (int i = 0; i < 5; i++) this.missileData[i] = new MissileData();
 
         this.setStepHeight(1F);
     }
@@ -360,10 +404,36 @@ abstract public class BasicEntityShip extends TamableAnimal implements IShipStat
     /* ==================== lifecycle ==================== */
 
     @Override
+    protected PathNavigation createNavigation(Level level)
+    {
+        this.shipNavigate = new ShipPathNavigation(this, level);
+        this.moveControl = new ShipMoveControl(this, 30F, false);
+        return this.shipNavigate;
+    }
+
+    @Override
     protected void registerGoals()
     {
-        this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(8, new com.lulan.shincolle.ai.ShipFollowOwnerGoal(this));
+        //legacy AIHandler priorities
+        this.goalSelector.addGoal(1, new com.lulan.shincolle.ai.ShipSitGoal(this));
+        this.goalSelector.addGoal(2, new com.lulan.shincolle.ai.ShipFleeGoal(this));
+        this.goalSelector.addGoal(3, new com.lulan.shincolle.ai.ShipGuardingGoal(this));
+        this.goalSelector.addGoal(4, new com.lulan.shincolle.ai.ShipFollowOwnerGoal(this));
+        this.goalSelector.addGoal(5, new com.lulan.shincolle.ai.ShipOpenDoorGoal(this, true));
+        this.goalSelector.addGoal(11, new com.lulan.shincolle.ai.ShipPickItemGoal(this, 6F));
+        this.goalSelector.addGoal(12, new com.lulan.shincolle.ai.ShipRangeAttackGoal(this));
+        this.goalSelector.addGoal(13, new com.lulan.shincolle.ai.ShipSkillAttackGoal(this));
+        if (this.getStateFlag(ID.F.UseMelee))
+        {
+            this.goalSelector.addGoal(15, new com.lulan.shincolle.ai.ShipAttackOnCollideGoal(this, 1D));
+        }
+        this.goalSelector.addGoal(23, new com.lulan.shincolle.ai.ShipFloatingGoal(this));
+        this.goalSelector.addGoal(24, new com.lulan.shincolle.ai.ShipWanderGoal(this, 10, 5, 0.8D));
+        this.goalSelector.addGoal(25, new com.lulan.shincolle.ai.ShipWatchClosestGoal(this, Player.class, 4F, 0.06F));
+        this.goalSelector.addGoal(26, new com.lulan.shincolle.ai.ShipLookIdleGoal(this));
+
+        this.targetSelector.addGoal(1, new com.lulan.shincolle.ai.ShipRevengeTargetGoal(this));
+        this.targetSelector.addGoal(5, new com.lulan.shincolle.ai.ShipRangeTargetGoal(this));
     }
 
     @Override
@@ -377,6 +447,22 @@ abstract public class BasicEntityShip extends TamableAnimal implements IShipStat
             if (StateTimer[i] > 0)
             {
                 StateTimer[i]--;
+            }
+        }
+
+        if (!this.level().isClientSide)
+        {
+            //liquid depth for floating AI
+            this.entityDepth = com.lulan.shincolle.utility.EntityHelper.getEntityDepth(this);
+
+            //target cleanup (dead / friendly / stale revenge)
+            com.lulan.shincolle.utility.TargetHelper.updateTarget(this);
+
+            //idle grudge consume + task update every 8 ticks
+            if ((this.tickCount & 7) == 0)
+            {
+                decrGrudgeNum(this.grudgeConsumeIdle);
+                com.lulan.shincolle.utility.TaskHelper.onUpdateTask(this);
             }
         }
 
@@ -658,6 +744,840 @@ abstract public class BasicEntityShip extends TamableAnimal implements IShipStat
         this.updateShipAttrs();
     }
 
+    /* ==================== IShipNavigator ==================== */
+
+    @Override
+    public ShipPathNavigation getShipNavigate()
+    {
+        return this.shipNavigate;
+    }
+
+    /* ==================== IShipOwner ==================== */
+
+    @Nullable
+    @Override
+    public Entity getHostEntity()
+    {
+        //ship's host = owner player
+        return this.getOwner();
+    }
+
+    /* ==================== IShipEmotion ==================== */
+
+    @Override
+    public int getTickExisted()
+    {
+        return this.tickCount;
+    }
+
+    @Override
+    public net.minecraft.util.RandomSource getRand()
+    {
+        return this.random;
+    }
+
+    @Override
+    public boolean getIsRiding()
+    {
+        return this.isPassenger();
+    }
+
+    @Override
+    public boolean getIsSitting()
+    {
+        return this.isOrderedToSit();
+    }
+
+    @Override
+    public boolean getIsSneaking()
+    {
+        return this.isShiftKeyDown();
+    }
+
+    @Override
+    public boolean getIsLeashed()
+    {
+        return this.isLeashed();
+    }
+
+    @Override
+    public void setEntitySit(boolean sit)
+    {
+        this.setOrderedToSit(sit);
+    }
+
+    @Override
+    public double getShipDepth(int type)
+    {
+        return this.entityDepth;
+    }
+
+    @Override
+    public int getScaleLevel()
+    {
+        return this.scaleLevel;
+    }
+
+    @Override
+    public void setScaleLevel(int level)
+    {
+        this.scaleLevel = level;
+    }
+
+    @Override
+    public float getModelRotate(int index)
+    {
+        return this.rotateAngle[index];
+    }
+
+    @Override
+    public void setModelRotate(int index, float value)
+    {
+        this.rotateAngle[index] = value;
+    }
+
+    /* ==================== IFloatingEntity ==================== */
+
+    @Override
+    public double getEntityDepth()
+    {
+        return this.entityDepth;
+    }
+
+    @Override
+    public void setEntityDepth(double depth)
+    {
+        this.entityDepth = depth;
+    }
+
+    @Override
+    public double getEntityFloatingDepth()
+    {
+        return this.entityFloatingDepth;
+    }
+
+    @Override
+    public void setEntityFloatingDepth(double depth)
+    {
+        this.entityFloatingDepth = depth;
+    }
+
+    /* ==================== IShipAttackBase ==================== */
+
+    @Nullable
+    @Override
+    public Entity getEntityTarget()
+    {
+        return this.entityTarget;
+    }
+
+    @Override
+    public void setEntityTarget(@Nullable Entity target)
+    {
+        this.entityTarget = target;
+    }
+
+    @Nullable
+    @Override
+    public Entity getEntityRevengeTarget()
+    {
+        return this.revengeTarget;
+    }
+
+    @Override
+    public void setEntityRevengeTarget(@Nullable Entity target)
+    {
+        this.revengeTarget = target;
+        this.revengeTime = this.tickCount;
+    }
+
+    @Override
+    public int getEntityRevengeTime()
+    {
+        return this.revengeTime;
+    }
+
+    /** mark revenge at current tick (legacy no-arg setter) */
+    @Override
+    public void setEntityRevengeTime()
+    {
+        this.revengeTime = this.tickCount;
+    }
+
+    @Override
+    public int getDamageType()
+    {
+        return this.getStateMinor(ID.M.DamageType);
+    }
+
+    /** attack type flag, id = ID.F.AtkType_* */
+    @Override
+    public boolean getAttackType(int id)
+    {
+        return this.getStateFlag(id);
+    }
+
+    @Override
+    public int getAmmoLight()
+    {
+        return this.getStateMinor(ID.M.NumAmmoLight);
+    }
+
+    @Override
+    public int getAmmoHeavy()
+    {
+        return this.getStateMinor(ID.M.NumAmmoHeavy);
+    }
+
+    @Override
+    public void setAmmoLight(int num)
+    {
+        this.setStateMinor(ID.M.NumAmmoLight, Math.max(0, num));
+    }
+
+    @Override
+    public void setAmmoHeavy(int num)
+    {
+        this.setStateMinor(ID.M.NumAmmoHeavy, Math.max(0, num));
+    }
+
+    @Override
+    public boolean hasAmmoLight()
+    {
+        return this.getStateMinor(ID.M.NumAmmoLight) > 0;
+    }
+
+    @Override
+    public boolean hasAmmoHeavy()
+    {
+        return this.getStateMinor(ID.M.NumAmmoHeavy) > 0;
+    }
+
+    @Override
+    public int getLevel()
+    {
+        return this.getStateMinor(ID.M.ShipLevel);
+    }
+
+    /** skill attack update; subclasses with skills override */
+    @Override
+    public boolean updateSkillAttack(Entity target)
+    {
+        return false;
+    }
+
+    @Override
+    public HashMap<Integer, Integer> getBuffMap()
+    {
+        return this.buffMap;
+    }
+
+    @Override
+    public void setBuffMap(HashMap<Integer, Integer> map)
+    {
+        this.buffMap = map;
+    }
+
+    @Override
+    public HashMap<Integer, int[]> getAttackEffectMap()
+    {
+        return this.attackEffectMap;
+    }
+
+    @Override
+    public void setAttackEffectMap(HashMap<Integer, int[]> map)
+    {
+        this.attackEffectMap = map;
+    }
+
+    @Override
+    public MissileData getMissileData(int type)
+    {
+        return this.missileData[type];
+    }
+
+    @Override
+    public void setMissileData(int type, MissileData data)
+    {
+        this.missileData[type] = data;
+    }
+
+    /* ==================== IShipGuardian ==================== */
+
+    @Nullable
+    @Override
+    public Entity getGuardedEntity()
+    {
+        //resolve by entity id
+        if (this.guardedEntity == null && this.getStateMinor(ID.M.GuardID) > 0)
+        {
+            Entity e = this.level().getEntity(this.getStateMinor(ID.M.GuardID));
+            if (e != null && e.isAlive()) this.guardedEntity = e;
+        }
+
+        return this.guardedEntity;
+    }
+
+    @Override
+    public void setGuardedEntity(@Nullable Entity entity)
+    {
+        if (entity != null && entity.isAlive())
+        {
+            this.guardedEntity = entity;
+            this.setStateMinor(ID.M.GuardID, entity.getId());
+        }
+        else
+        {
+            this.guardedEntity = null;
+            this.setStateMinor(ID.M.GuardID, -1);
+        }
+    }
+
+    /** index 0:x 1:y 2:z 3:dim 4:type */
+    @Override
+    public int getGuardedPos(int index)
+    {
+        return switch (index)
+        {
+            case 0 -> this.getStateMinor(ID.M.GuardX);
+            case 1 -> this.getStateMinor(ID.M.GuardY);
+            case 2 -> this.getStateMinor(ID.M.GuardZ);
+            case 3 -> this.getStateMinor(ID.M.GuardDim);
+            case 4 -> this.getStateMinor(ID.M.GuardType);
+            default -> -1;
+        };
+    }
+
+    @Override
+    public void setGuardedPos(int x, int y, int z, int dim, int type)
+    {
+        this.setStateMinor(ID.M.GuardX, x);
+        this.setStateMinor(ID.M.GuardY, y);
+        this.setStateMinor(ID.M.GuardZ, z);
+        this.setStateMinor(ID.M.GuardDim, dim);
+        this.setStateMinor(ID.M.GuardType, type);
+    }
+
+    @Override
+    public net.minecraft.core.BlockPos getLastWaypoint()
+    {
+        return this.lastWaypoint;
+    }
+
+    @Override
+    public void setLastWaypoint(net.minecraft.core.BlockPos pos)
+    {
+        this.lastWaypoint = pos;
+    }
+
+    @Override
+    public int getWpStayTime()
+    {
+        return this.getStateTimer(ID.T.WpStayTime);
+    }
+
+    @Override
+    public int getWpStayTimeMax()
+    {
+        return wpStayTime2Ticks(this.getStateMinor(ID.M.WpStay));
+    }
+
+    @Override
+    public void setWpStayTime(int time)
+    {
+        this.setStateTimer(ID.T.WpStayTime, time);
+    }
+
+    /** convert waypoint stay setting to ticks (legacy GuardHandler) */
+    public static int wpStayTime2Ticks(int wpstay)
+    {
+        if (wpstay >= 1 && wpstay <= 5) return wpstay * 100;
+        if (wpstay >= 6 && wpstay <= 10) return (wpstay - 5) * 1200;
+        if (wpstay >= 11 && wpstay <= 16) return (wpstay - 10) * 12000;
+        return 0;
+    }
+
+    /* ==================== IShipCannonAttack ==================== */
+
+    @Override
+    public boolean useAmmoLight()
+    {
+        return this.getStateFlag(ID.F.UseAmmoLight);
+    }
+
+    @Override
+    public boolean useAmmoHeavy()
+    {
+        return this.getStateFlag(ID.F.UseAmmoHeavy);
+    }
+
+    /**
+     * consume ammo from state; 0:light 1:heavy. Auto-consumes ammo
+     * items from inventory when empty (legacy decrAmmoNum).
+     */
+    public boolean decrAmmoNum(int type, int amount)
+    {
+        int cur = (type == 0) ? this.getStateMinor(ID.M.NumAmmoLight)
+                            : this.getStateMinor(ID.M.NumAmmoHeavy);
+
+        if (cur < amount)
+        {
+            //try consume ammo item from inventory
+            int rest = amount - cur;
+            int got = consumeAmmoItem(type, rest);
+            cur += got;
+
+            if (cur < amount) return false;
+        }
+
+        if (type == 0)
+        {
+            this.setStateMinor(ID.M.NumAmmoLight, cur - amount);
+        }
+        else
+        {
+            this.setStateMinor(ID.M.NumAmmoHeavy, cur - amount);
+        }
+
+        return true;
+    }
+
+    /** pull ammo items out of the ship inventory, returns units gained */
+    protected int consumeAmmoItem(int type, int need)
+    {
+        int got = 0;
+
+        for (int i = 0; i < this.shipInventory.getSlots() && got < need; i++)
+        {
+            ItemStack s = this.shipInventory.getStackInSlot(i);
+
+            if (s.isEmpty()) continue;
+
+            //light ammo item (meta0) = 1 unit; heavy uses heavy ammo item
+            boolean lightItem = s.is(ModItems.AMMO.get()) || s.is(ModItems.AMMO_1.get());
+            boolean heavyItem = s.is(ModItems.AMMO_2.get()) || s.is(ModItems.AMMO_3.get());
+
+            if ((type == 0 && lightItem) || (type == 1 && heavyItem))
+            {
+                got += s.getCount();
+                this.shipInventory.setStackInSlot(i, ItemStack.EMPTY);
+            }
+        }
+
+        return got;
+    }
+
+    /** consume grudge; auto-eats grudge items when empty (legacy decrGrudge) */
+    public void decrGrudgeNum(int value)
+    {
+        float modGrudge = this.shipAttrs.getAttrsBuffed(ID.Attrs.GRUDGE);
+
+        if (value > 0)
+        {
+            int level = BuffHelper.getPotionLevel(this.buffMap, 17);
+            value = (int) (value * (1F + level * 2F));
+        }
+        else if (value < 0)
+        {
+            value = (int) (value * modGrudge);
+        }
+
+        if (!this.getStateFlag(ID.F.NoFuel))
+        {
+            this.addGrudge(-value);
+        }
+
+        //auto eat one grudge item when empty
+        if (this.getStateMinor(ID.M.NumGrudge) <= 0)
+        {
+            int got = consumeGrudgeItem();
+            int add = 0;
+
+            if (got == 0) add = (int) (ShinColleConfig.baseGrudge * modGrudge);
+            else if (got == 1) add = (int) (ShinColleConfig.baseGrudge * 9 * modGrudge);
+
+            this.addGrudge(add);
+        }
+
+        this.setStateFlag(ID.F.NoFuel, this.getStateMinor(ID.M.NumGrudge) <= 0);
+    }
+
+    /** find + consume one grudge item; 0:item 1:block -1:none */
+    protected int consumeGrudgeItem()
+    {
+        for (int i = 0; i < this.shipInventory.getSlots(); i++)
+        {
+            ItemStack s = this.shipInventory.getStackInSlot(i);
+
+            if (s.isEmpty()) continue;
+
+            if (s.is(com.lulan.shincolle.registry.ModBlocks.ITEM_GRUDGE.get()))
+            {
+                s.shrink(1);
+                return 1;
+            }
+            if (s.is(ModItems.GRUDGE.get()) || s.is(ModItems.GRUDGE_1.get()))
+            {
+                s.shrink(1);
+                return 0;
+            }
+        }
+
+        return -1;
+    }
+
+    public void addGrudge(int value)
+    {
+        if (value > 0 && ShinColleConfig.easyMode) value *= 10;
+        this.setStateMinor(ID.M.NumGrudge, Math.max(0, this.getStateMinor(ID.M.NumGrudge) + value));
+    }
+
+    public void addAmmoLight(int value)
+    {
+        if (value > 0 && ShinColleConfig.easyMode) value *= 10;
+        this.setStateMinor(ID.M.NumAmmoLight, Math.max(0, this.getStateMinor(ID.M.NumAmmoLight) + value));
+    }
+
+    public void addAmmoHeavy(int value)
+    {
+        if (value > 0 && ShinColleConfig.easyMode) value *= 10;
+        this.setStateMinor(ID.M.NumAmmoHeavy, Math.max(0, this.getStateMinor(ID.M.NumAmmoHeavy) + value));
+    }
+
+    public void addMorale(int value)
+    {
+        int n = this.getMorale() + value;
+        if (n < 0) n = 0;
+        else if (n > 16000) n = 16000;
+        this.setMorale(n);
+    }
+
+    /** morale decrease by attack type 0:melee 1:light 2:heavy 3:airL 4:airH */
+    public void decrMorale(int type)
+    {
+        switch (type)
+        {
+        case 0 -> addMorale(-2);
+        case 1 -> addMorale(-4);
+        case 2 -> addMorale(-6);
+        case 3 -> addMorale(-6);
+        case 4 -> addMorale(-8);
+        default -> {}
+        }
+    }
+
+    /** combat start marker (legacy records current tick + immunity window) */
+    protected int lastCombatTick = 0;
+
+    public void setCombatTick(int tick)
+    {
+        this.lastCombatTick = tick;
+        this.setStateTimer(ID.T.LastCombat, 100);
+    }
+
+    public int getLastCombatTick()
+    {
+        return this.lastCombatTick;
+    }
+
+    /* ==================== attack ==================== */
+
+    /** base attack damage for type 0:melee 1:light 2:heavy 3:airL 4:airH */
+    public float getAttackBaseDamage(int type, @Nullable Entity target)
+    {
+        float dmg = switch (type)
+        {
+            case 1 -> this.shipAttrs.getAttrsBuffed(ID.Attrs.ATK_L);
+            case 2 -> this.shipAttrs.getAttrsBuffed(ID.Attrs.ATK_H);
+            case 3 -> this.shipAttrs.getAttrsBuffed(ID.Attrs.ATK_AL);
+            case 4 -> this.shipAttrs.getAttrsBuffed(ID.Attrs.ATK_AH);
+            default -> this.shipAttrs.getAttrsBuffed(ID.Attrs.ATK_L) * 0.125F;
+        };
+
+        if (target != null)
+        {
+            dmg = com.lulan.shincolle.utility.CombatHelper.modDamageByAttrs(this, target, dmg);
+        }
+
+        return dmg;
+    }
+
+    /** melee attack (legacy attackEntityAsMob) */
+    @Override
+    public boolean doHurtTarget(Entity target)
+    {
+        float atk = getAttackBaseDamage(0, target);
+
+        this.addShipExp(ShinColleConfig.expGain[0]);
+        decrMorale(0);
+        setCombatTick(this.tickCount);
+
+        boolean isTargetHurt = target.hurt(this.damageSources().mobAttack(this), atk);
+
+        if (isTargetHurt)
+        {
+            if (!com.lulan.shincolle.utility.TeamHelper.checkSameOwner(this, target))
+            {
+                BuffHelper.applyBuffOnTarget(target, this.attackEffectMap);
+            }
+        }
+
+        return isTargetHurt;
+    }
+
+    /** light cannon attack (legacy attackEntityWithAmmo) */
+    @Override
+    public boolean attackEntityWithAmmo(Entity target)
+    {
+        if (!decrAmmoNum(0, this.getAmmoConsumption())) return false;
+
+        this.addShipExp(ShinColleConfig.expGain[1]);
+        decrGrudgeNum(ShinColleConfig.consumeGrudgeAction[ID.ShipConsume.LAtk]);
+        decrMorale(1);
+        setCombatTick(this.tickCount);
+
+        float atk = getAttackBaseDamage(1, target);
+        var distVec = com.lulan.shincolle.utility.CalcHelper.getDistanceFromA2B(this, target);
+
+        applySoundAtAttacker(1, target);
+        applyParticleAtAttacker(1, target, distVec.d);
+
+        atk = com.lulan.shincolle.utility.CombatHelper.applyCombatRateToDamage(
+            this, target, true, (float) distVec.d, atk);
+        atk = com.lulan.shincolle.utility.CombatHelper.applyDamageReduceOnPlayer(target, atk);
+        if (!com.lulan.shincolle.utility.TeamHelper.doFriendlyFire(this, target)) atk = 0F;
+
+        boolean isTargetHurt = target.hurt(this.damageSources().mobProjectile(this, null), atk);
+
+        if (isTargetHurt)
+        {
+            if (!com.lulan.shincolle.utility.TeamHelper.checkSameOwner(this, target))
+            {
+                BuffHelper.applyBuffOnTarget(target, this.attackEffectMap);
+            }
+            applySoundAtTarget(1, target);
+            applyParticleAtTarget(1, target, distVec.d);
+            applyEmotesReaction(3);
+            if (ShinColleConfig.canFlare) flareTarget(target);
+        }
+
+        return isTargetHurt;
+    }
+
+    /** heavy cannon attack: missile bombard (legacy attackEntityWithHeavyAmmo) */
+    @Override
+    public boolean attackEntityWithHeavyAmmo(Entity target)
+    {
+        if (!decrAmmoNum(1, this.getAmmoConsumption())) return false;
+
+        this.addShipExp(ShinColleConfig.expGain[2]);
+        decrGrudgeNum(ShinColleConfig.consumeGrudgeAction[ID.ShipConsume.HAtk]);
+        decrMorale(2);
+        setCombatTick(this.tickCount);
+
+        var distVec = com.lulan.shincolle.utility.CalcHelper.getDistanceFromA2B(this, target);
+
+        applySoundAtAttacker(2, target);
+        applyParticleAtAttacker(2, target, distVec.d);
+
+        float tarX = (float) target.getX();
+        float tarY = (float) target.getY();
+        float tarZ = (float) target.getZ();
+
+        //miss: scatter target pos
+        if (this.random.nextFloat() <= com.lulan.shincolle.utility.CombatHelper.calcMissRate(
+                this, (float) distVec.d))
+        {
+            tarX = tarX - 5F + this.random.nextFloat() * 10F;
+            tarY = tarY + this.random.nextFloat() * 5F;
+            tarZ = tarZ - 5F + this.random.nextFloat() * 10F;
+            com.lulan.shincolle.utility.ParticleHelper.spawnAttackTextParticle(this, 0);
+        }
+
+        float atk = getAttackBaseDamage(2, target);
+        summonMissile(2, atk, tarX, tarY, tarZ, target.getBbHeight());
+
+        applySoundAtTarget(2, target);
+        applyParticleAtTarget(2, target, distVec.d);
+        applyEmotesReaction(3);
+
+        if (ShinColleConfig.canFlare) flareTarget(target.blockPosition());
+
+        return true;
+    }
+
+    /** spawn attack missile; attackType 0:melee 1:light 2:heavy */
+    public void summonMissile(int attackType, float atk, float tarX, float tarY, float tarZ,
+            float targetHeight)
+    {
+        float launchPos = (float) this.getY() + this.getBbHeight() * 0.5F;
+        int moveType = com.lulan.shincolle.utility.CombatHelper.calcMissileMoveType(this, tarY, attackType);
+        if (moveType == 0) launchPos = (float) this.getY() + this.getBbHeight() * 0.3F;
+
+        MissileData md = this.getMissileData(attackType);
+        float[] data = new float[] {atk, 0.15F, launchPos, tarX, tarY + targetHeight * 0.1F, tarZ,
+            140, 0.25F, md.vel0, md.accY1, md.accY2};
+        EntityAbyssMissile missile = new EntityAbyssMissile(
+            com.lulan.shincolle.registry.ModEntities.ABYSS_MISSILE.get(), this.level(),
+            this, md.type, moveType, data);
+        this.level().addFreshEntity(missile);
+    }
+
+    /** attack side effects: sound at attacker (Phase 5 packets for custom) */
+    public void applySoundAtAttacker(int type, @Nullable Entity target)
+    {
+        SoundEvent se = switch (type)
+        {
+            case 1 -> ModSounds.SHIP_FIRELIGHT.get();
+            case 2 -> ModSounds.SHIP_FIREHEAVY.get();
+            case 3, 4 -> ModSounds.SHIP_AIRCRAFT.get();
+            default -> null;
+        };
+
+        if (se != null)
+        {
+            this.level().playSound(null, this.blockPosition(), se, this.getSoundSource(),
+                ShinColleConfig.volumeShip, 1F);
+        }
+    }
+
+    /** attack side effects: sound at target */
+    public void applySoundAtTarget(int type, @Nullable Entity target)
+    {
+        if (type == 2 && target != null)
+        {
+            this.level().playSound(null, target.blockPosition(), ModSounds.SHIP_EXPLODE.get(),
+                this.getSoundSource(), ShinColleConfig.volumeShip, 1F);
+        }
+    }
+
+    /** attack particles at attacker (legacy type ids, Phase 5 custom packet) */
+    public void applyParticleAtAttacker(int type, @Nullable Entity target, double dist)
+    {
+        if (type == 0)
+        {
+            com.lulan.shincolle.utility.ParticleHelper.spawnAttackParticle(this,
+                this.getX(), this.getY() + this.getBbHeight() * 0.5D, this.getZ(), 0.3D, 0);
+        }
+        else
+        {
+            com.lulan.shincolle.utility.ParticleHelper.spawnAttackParticle(this,
+                this.getX(), this.getY() + this.getBbHeight() * 0.6D, this.getZ(), 0.5D, type);
+        }
+    }
+
+    public void applyParticleAtTarget(int type, @Nullable Entity target, double dist)
+    {
+        if (target != null)
+        {
+            com.lulan.shincolle.utility.ParticleHelper.spawnAttackParticle(target,
+                target.getX(), target.getY() + target.getBbHeight() * 0.5D,
+                target.getZ(), 0.5D, type);
+        }
+    }
+
+    /** emote reaction (0:sweat 1:heart 3:haha etc.) -> emotion face state */
+    public void applyEmotesReaction(int type)
+    {
+        if (this.getStateTimer(ID.T.EmoteDelay) <= 0)
+        {
+            this.setStateEmotion(ID.S.Emotion3, type, true);
+            this.setStateTimer(ID.T.EmoteDelay, 40);
+        }
+    }
+
+    /** emote particle at face (legacy applyParticleEmotion) */
+    public void applyParticleEmotion(int type)
+    {
+        this.setStateEmotion(ID.S.Emotion, type, true);
+    }
+
+    /** flare effect on target pos (reveal submarine) */
+    public void flareTarget(Entity target)
+    {
+        if (target != null && this.getStateMinor(ID.M.LevelFlare) > 0)
+        {
+            flareTarget(target.blockPosition());
+        }
+    }
+
+    public void flareTarget(net.minecraft.core.BlockPos target)
+    {
+        if (this.getStateMinor(ID.M.LevelFlare) > 0 && this.level() instanceof ServerLevel sl)
+        {
+            sl.sendParticles(net.minecraft.core.particles.ParticleTypes.FLAME,
+                target.getX() + 0.5D, target.getY() + 1D, target.getZ() + 0.5D,
+                20, 0.5D, 1D, 0.5D, 0.01D);
+        }
+    }
+
+    /* ==================== items / exp ==================== */
+
+    /** inventory mainhand slot (legacy slot 22) */
+    public ItemStack getHeldItemMainhand()
+    {
+        return this.shipInventory.getStackInSlot(22);
+    }
+
+    /** inventory offhand slot (legacy slot 23) */
+    public ItemStack getHeldItemOffhand()
+    {
+        return this.shipInventory.getStackInSlot(23);
+    }
+
+    public static int calcExpNext(int level)
+    {
+        int exp = (level + 1) * ShinColleConfig.expMod;
+        return Math.max(exp, 1);
+    }
+
+    /** add ship exp + level ups (server side) */
+    public void addShipExp(int exp)
+    {
+        int capLevel = this.getStateFlag(ID.F.IsMarried) ? ShinColleConfig.maxLevel
+                                                       : ShinColleConfig.midLimitLevel;
+        int curLevel = this.getStateMinor(ID.M.ShipLevel);
+
+        if (curLevel >= capLevel) return;
+
+        exp = (int) (exp * this.shipAttrs.getAttrsBuffed(ID.Attrs.XP));
+
+        int curExp = this.getStateMinor(ID.M.ExpCurrent) + exp;
+        int nextExp = this.getStateMinor(ID.M.ExpNext);
+        if (nextExp <= 0) nextExp = calcExpNext(curLevel);
+
+        while (curExp >= nextExp && curLevel < capLevel)
+        {
+            this.level().playSound(null, this.blockPosition(), SoundEvents.PLAYER_LEVELUP,
+                this.getSoundSource(), 0.7F, 1F);
+
+            if (this.random.nextInt(4) == 0)
+            {
+                this.playSound(ModSounds.SHIP_LEVEL.get(), ShinColleConfig.volumeShip, 1F);
+            }
+
+            curLevel++;
+            curExp -= nextExp;
+            nextExp = calcExpNext(curLevel);
+        }
+
+        this.setStateMinor(ID.M.ExpCurrent, curExp);
+        this.setStateMinor(ID.M.ExpNext, nextExp);
+
+        if (curLevel != this.getStateMinor(ID.M.ShipLevel))
+        {
+            this.setShipLevel(curLevel, true);
+            this.updateShipAttrs();
+            this.setHealth(this.getMaxHealth());
+        }
+    }
+
+    /** add kills count */
+    public void addKills(int value)
+    {
+        this.setStateMinor(ID.M.Kills, this.getStateMinor(ID.M.Kills) + value);
+    }
+
     /* ==================== misc ==================== */
 
     @Override
@@ -677,6 +1597,20 @@ abstract public class BasicEntityShip extends TamableAnimal implements IShipStat
     protected void playStepSound(net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state)
     {
         //ships have no footstep sound
+    }
+
+    /** per-class voice line; type: 0 idle 1 hurt 2 dead 3 marry 4 knockback
+     *  5 timekeep 6 pickitem 7 feed 8 equip. Subclasses may override. */
+    @Nullable
+    public SoundEvent getCustomSound(int type)
+    {
+        return switch (type)
+        {
+            case 1 -> ModSounds.SHIP_HURT.get();
+            case 2 -> ModSounds.SHIP_DEATH.get();
+            case 6, 7 -> ModSounds.SHIP_FEED.get();
+            default -> ModSounds.SHIP_IDLE.get();
+        };
     }
 
     @Nullable

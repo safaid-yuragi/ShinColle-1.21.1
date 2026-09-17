@@ -12,6 +12,9 @@ import com.lulan.shincolle.registry.ModAttachments;
 import com.lulan.shincolle.registry.ModBlockEntities;
 import com.lulan.shincolle.registry.ModBlocks;
 import com.lulan.shincolle.registry.ModComponents;
+import com.lulan.shincolle.registry.ModFeatures;
+import com.lulan.shincolle.registry.ModLootModifiers;
+import com.lulan.shincolle.registry.ModRecipeSerializers;
 import com.lulan.shincolle.registry.ModEntities;
 import com.lulan.shincolle.registry.ModItems;
 import com.lulan.shincolle.registry.ModMenus;
@@ -51,6 +54,9 @@ public class ShinColle
         ModAttachments.ATTACHMENTS.register(modBus);
         ModTabs.TABS.register(modBus);
         ModComponents.COMPONENTS.register(modBus);
+        ModRecipeSerializers.RECIPE_SERIALIZERS.register(modBus);
+        ModLootModifiers.LOOT_MODIFIERS.register(modBus);
+        ModFeatures.FEATURES.register(modBus);
 
         //config (shincolle-common.toml / shincolle-client.toml)
         container.registerConfig(ModConfig.Type.COMMON, ShinColleConfig.COMMON_SPEC);

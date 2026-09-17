@@ -1,13 +1,19 @@
 package com.lulan.shincolle.entity;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import com.lulan.shincolle.ai.path.ShipMoveControl;
+import com.lulan.shincolle.ai.path.ShipPathNavigation;
 import com.lulan.shincolle.config.ShinColleConfig;
 import com.lulan.shincolle.reference.ID;
 import com.lulan.shincolle.reference.dataclass.Attrs;
-import com.lulan.shincolle.utility.LogHelper;
+import com.lulan.shincolle.reference.dataclass.MissileData;
+import com.lulan.shincolle.utility.BuffHelper;
+import com.lulan.shincolle.utility.CombatHelper;
+import com.lulan.shincolle.utility.TeamHelper;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -15,6 +21,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -22,7 +29,9 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * summon/minion base (legacy BasicEntitySummon extends EntityCreature).
@@ -31,7 +40,8 @@ import net.minecraft.world.level.Level;
  * mounts). They keep a host reference (entity id + uuid) and die with
  * their host.
  */
-abstract public class BasicEntitySummon extends PathfinderMob implements IShipState
+abstract public class BasicEntitySummon extends PathfinderMob
+        implements IShipCannonAttack, IShipOwner, IFloatingEntity
 {
 
     protected static final EntityDataAccessor<Integer> DATA_FLAGS =
@@ -62,6 +72,25 @@ abstract public class BasicEntitySummon extends PathfinderMob implements IShipSt
     protected int numAmmoLight = 6;
     protected int numAmmoHeavy = 0;
 
+    /** ship path navigation */
+    protected ShipPathNavigation shipNavigate;
+
+    /** attack target / revenge target */
+    @Nullable
+    protected Entity entityTarget;
+    @Nullable
+    protected Entity revengeTarget;
+    protected int revengeTime = 0;
+
+    /** liquid depth for floating AI */
+    protected double entityDepth = 0D;
+    protected double entityFloatingDepth = 0D;
+
+    /** effect maps (legacy; mostly unused on summons) */
+    protected HashMap<Integer, Integer> buffMap = new HashMap<>();
+    protected HashMap<Integer, int[]> attackEffectMap = new HashMap<>();
+    protected MissileData[] missileData = new MissileData[5];
+
     private boolean stateDirty = false;
 
     /** model render rotation (Phase 7) */
@@ -74,6 +103,8 @@ abstract public class BasicEntitySummon extends PathfinderMob implements IShipSt
         this.shipAttrs = new Attrs();
         this.setStepHeight(1F);
         this.StateFlag[ID.F.CanDrop] = true;
+
+        for (int i = 0; i < 5; i++) this.missileData[i] = new MissileData();
     }
 
     /* ==================== entity data ==================== */
@@ -161,11 +192,13 @@ abstract public class BasicEntitySummon extends PathfinderMob implements IShipSt
         }
     }
 
+    @Override
     public int getScaleLevel()
     {
         return this.scaleLevel;
     }
 
+    @Override
     public void setScaleLevel(int level)
     {
         this.scaleLevel = level;
@@ -178,6 +211,13 @@ abstract public class BasicEntitySummon extends PathfinderMob implements IShipSt
     {
         this.setHost(host);
         this.setScaleLevel(scaleLevel);
+
+        if (host instanceof IShipAttackBase base)
+        {
+            //copy attrs scaled by host summon-bonus (legacy initAttrs)
+            this.shipAttrs = base.getAttrs();
+            this.setEntityTarget(base.getEntityTarget());
+        }
     }
 
     /* ==================== attrs ==================== */
@@ -216,6 +256,14 @@ abstract public class BasicEntitySummon extends PathfinderMob implements IShipSt
     /* ==================== lifecycle ==================== */
 
     @Override
+    protected PathNavigation createNavigation(Level level)
+    {
+        this.shipNavigate = new ShipPathNavigation(this, level);
+        this.moveControl = new ShipMoveControl(this, 30F, false);
+        return this.shipNavigate;
+    }
+
+    @Override
     protected void registerGoals()
     {
         this.goalSelector.addGoal(0, new FloatGoal(this));
@@ -233,6 +281,11 @@ abstract public class BasicEntitySummon extends PathfinderMob implements IShipSt
 
         if (!this.level().isClientSide)
         {
+            this.entityDepth =
+                com.lulan.shincolle.utility.EntityHelper.getEntityDepth(this);
+
+            com.lulan.shincolle.utility.TargetHelper.updateTarget(this);
+
             //re-resolve host
             if (this.host == null && this.hostUUID != null && this.level() instanceof ServerLevel sl)
             {
@@ -292,6 +345,342 @@ abstract public class BasicEntitySummon extends PathfinderMob implements IShipSt
         this.scaleLevel = tag.getByte("ScaleLV");
         this.numAmmoLight = tag.getInt("AmmoLight");
         this.numAmmoHeavy = tag.getInt("AmmoHeavy");
+    }
+
+    /* ==================== IShipNavigator ==================== */
+
+    @Override
+    public ShipPathNavigation getShipNavigate()
+    {
+        return this.shipNavigate;
+    }
+
+    /* ==================== IShipOwner ==================== */
+
+    @Override
+    public int getPlayerUID()
+    {
+        if (this.host instanceof IShipOwner owner) return owner.getPlayerUID();
+        return this.getStateMinor(ID.M.PlayerUID);
+    }
+
+    @Override
+    public void setPlayerUID(int uid)
+    {
+        this.setStateMinor(ID.M.PlayerUID, uid);
+    }
+
+    @Nullable
+    @Override
+    public Entity getHostEntity()
+    {
+        return this.host;
+    }
+
+    /* ==================== IShipEmotion ==================== */
+
+    @Override
+    public int getTickExisted()
+    {
+        return this.tickCount;
+    }
+
+    @Override
+    public RandomSource getRand()
+    {
+        return this.random;
+    }
+
+    @Override
+    public boolean getIsRiding()
+    {
+        return this.isPassenger();
+    }
+
+    @Override
+    public boolean getIsSitting()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean getIsSneaking()
+    {
+        return this.isShiftKeyDown();
+    }
+
+    @Override
+    public boolean getIsLeashed()
+    {
+        return false;
+    }
+
+    @Override
+    public void setEntitySit(boolean sit) {}
+
+    @Override
+    public double getShipDepth(int type)
+    {
+        return this.entityDepth;
+    }
+
+    @Override
+    public float getModelRotate(int index)
+    {
+        return this.rotateAngle[index];
+    }
+
+    @Override
+    public void setModelRotate(int index, float value)
+    {
+        this.rotateAngle[index] = value;
+    }
+
+    /* ==================== IFloatingEntity ==================== */
+
+    @Override
+    public double getEntityDepth()
+    {
+        return this.entityDepth;
+    }
+
+    @Override
+    public void setEntityDepth(double depth)
+    {
+        this.entityDepth = depth;
+    }
+
+    @Override
+    public double getEntityFloatingDepth()
+    {
+        return this.entityFloatingDepth;
+    }
+
+    @Override
+    public void setEntityFloatingDepth(double depth)
+    {
+        this.entityFloatingDepth = depth;
+    }
+
+    /* ==================== IShipAttackBase ==================== */
+
+    @Nullable
+    @Override
+    public Entity getEntityTarget()
+    {
+        return this.entityTarget;
+    }
+
+    @Override
+    public void setEntityTarget(@Nullable Entity target)
+    {
+        this.entityTarget = target;
+    }
+
+    @Nullable
+    @Override
+    public Entity getEntityRevengeTarget()
+    {
+        return this.revengeTarget;
+    }
+
+    @Override
+    public void setEntityRevengeTarget(@Nullable Entity target)
+    {
+        this.revengeTarget = target;
+        this.revengeTime = this.tickCount;
+    }
+
+    @Override
+    public int getEntityRevengeTime()
+    {
+        return this.revengeTime;
+    }
+
+    @Override
+    public void setEntityRevengeTime()
+    {
+        this.revengeTime = this.tickCount;
+    }
+
+    @Override
+    public int getDamageType()
+    {
+        return this.getStateMinor(ID.M.DamageType);
+    }
+
+    @Override
+    public boolean getAttackType(int id)
+    {
+        return this.getStateFlag(id);
+    }
+
+    @Override
+    public int getAmmoLight()
+    {
+        return this.numAmmoLight;
+    }
+
+    @Override
+    public int getAmmoHeavy()
+    {
+        return this.numAmmoHeavy;
+    }
+
+    @Override
+    public void setAmmoLight(int num)
+    {
+        this.numAmmoLight = num;
+    }
+
+    @Override
+    public void setAmmoHeavy(int num)
+    {
+        this.numAmmoHeavy = num;
+    }
+
+    @Override
+    public boolean hasAmmoLight()
+    {
+        return this.numAmmoLight > 0;
+    }
+
+    @Override
+    public boolean hasAmmoHeavy()
+    {
+        return this.numAmmoHeavy > 0;
+    }
+
+    @Override
+    public int getLevel()
+    {
+        if (this.host instanceof IShipAttackBase base) return base.getLevel();
+        return 150;
+    }
+
+    @Override
+    public Attrs getAttrs()
+    {
+        return this.shipAttrs;
+    }
+
+    @Override
+    public boolean updateSkillAttack(Entity target)
+    {
+        return false;
+    }
+
+    @Override
+    public HashMap<Integer, Integer> getBuffMap()
+    {
+        return this.buffMap;
+    }
+
+    @Override
+    public void setBuffMap(HashMap<Integer, Integer> map)
+    {
+        this.buffMap = map;
+    }
+
+    @Override
+    public HashMap<Integer, int[]> getAttackEffectMap()
+    {
+        return this.attackEffectMap;
+    }
+
+    @Override
+    public void setAttackEffectMap(HashMap<Integer, int[]> map)
+    {
+        this.attackEffectMap = map;
+    }
+
+    @Override
+    public MissileData getMissileData(int type)
+    {
+        return this.missileData[type];
+    }
+
+    @Override
+    public void setMissileData(int type, MissileData data)
+    {
+        this.missileData[type] = data;
+    }
+
+    /* ==================== IShipCannonAttack ==================== */
+
+    @Override
+    public boolean useAmmoLight()
+    {
+        return this.getStateFlag(ID.F.UseAmmoLight);
+    }
+
+    @Override
+    public boolean useAmmoHeavy()
+    {
+        return this.getStateFlag(ID.F.UseAmmoHeavy);
+    }
+
+    /** light attack: launch small missile at target (legacy summon attack) */
+    @Override
+    public boolean attackEntityWithAmmo(Entity target)
+    {
+        if (this.numAmmoLight <= 0) return false;
+        this.numAmmoLight--;
+
+        float atk = CombatHelper.applyCombatRateToDamage(this, target, true,
+            (float) this.distanceTo(target), this.shipAttrs.getAttackDamage() *
+            (this.getStateFlag(ID.F.IsMarried) ? 2F : 1F));
+
+        summonMissile(1, atk, (float) target.getX(), (float) target.getY(),
+            (float) target.getZ(), target.getBbHeight());
+        return true;
+    }
+
+    /** heavy attack: same launch, heavier damage */
+    @Override
+    public boolean attackEntityWithHeavyAmmo(Entity target)
+    {
+        if (this.numAmmoHeavy <= 0) return false;
+        this.numAmmoHeavy--;
+
+        float atk = CombatHelper.applyCombatRateToDamage(this, target, true,
+            (float) this.distanceTo(target), this.shipAttrs.getAttackDamage() * 3F);
+
+        summonMissile(2, atk, (float) target.getX(), (float) target.getY(),
+            (float) target.getZ(), target.getBbHeight());
+        return true;
+    }
+
+    /** spawn attack missile toward target pos */
+    public void summonMissile(int attackType, float atk, float tarX, float tarY, float tarZ,
+            float targetHeight)
+    {
+        float launchPos = (float) this.getY() + this.getBbHeight() * 0.5F;
+        int moveType = CombatHelper.calcMissileMoveType(this, tarY, attackType);
+        if (moveType == 0) launchPos = (float) this.getY() + this.getBbHeight() * 0.3F;
+
+        MissileData md = this.getMissileData(attackType);
+        float[] data = new float[] {atk, 0.15F, launchPos, tarX, tarY + targetHeight * 0.1F, tarZ,
+            140, 0.25F, md.vel0, md.accY1, md.accY2};
+        EntityAbyssMissile missile = new EntityAbyssMissile(
+            com.lulan.shincolle.registry.ModEntities.ABYSS_MISSILE.get(), this.level(),
+            this, md.type, moveType, data);
+        this.level().addFreshEntity(missile);
+    }
+
+    /** melee attack (legacy attackEntityAsMob) */
+    @Override
+    public boolean doHurtTarget(Entity target)
+    {
+        float atk = this.shipAttrs.getAttackDamage() * 0.125F;
+        boolean hurt = target.hurt(this.damageSources().mobAttack(this), atk);
+
+        if (hurt && !TeamHelper.checkSameOwner(this, target))
+        {
+            BuffHelper.applyBuffOnTarget(target, this.attackEffectMap);
+        }
+
+        return hurt;
     }
 
     /* ==================== misc ==================== */
