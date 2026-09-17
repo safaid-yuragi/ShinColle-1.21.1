@@ -638,24 +638,24 @@ public final class ShinColleConfig
     {
         switch (shipIcon)
         {
-        case ID.IconType.DESTROYER:
+        case ID.ShipIconType.DESTROYER:
             return itemSlotsClass[0];
-        case ID.IconType.LIGHT_CRUISER:
-        case ID.IconType.HEAVY_CRUISER:
-        case ID.IconType.TORPEDO_CRUISER:
+        case ID.ShipIconType.LIGHT_CRUISER:
+        case ID.ShipIconType.HEAVY_CRUISER:
+        case ID.ShipIconType.TORPEDO_CRUISER:
             return itemSlotsClass[1];
-        case ID.IconType.LIGHT_CARRIER:
-        case ID.IconType.STANDARD_CARRIER:
+        case ID.ShipIconType.LIGHT_CARRIER:
+        case ID.ShipIconType.STANDARD_CARRIER:
             return itemSlotsClass[2];
-        case ID.IconType.BATTLESHIP:
+        case ID.ShipIconType.BATTLESHIP:
             return itemSlotsClass[3];
-        case ID.IconType.TRANSPORT:
+        case ID.ShipIconType.TRANSPORT:
             return itemSlotsClass[4];
-        case ID.IconType.SUBMARINE:
+        case ID.ShipIconType.SUBMARINE:
             return itemSlotsClass[5];
-        case ID.IconType.DEMON:
+        case ID.ShipIconType.DEMON:
             return itemSlotsClass[6];
-        case ID.IconType.HIME:
+        case ID.ShipIconType.HIME:
             return itemSlotsClass[7];
         default:
             return 0;
@@ -666,24 +666,24 @@ public final class ShinColleConfig
     {
         switch (shipIcon)
         {
-        case ID.IconType.DESTROYER:
+        case ID.ShipIconType.DESTROYER:
             return equipSlotsClass[0];
-        case ID.IconType.LIGHT_CRUISER:
-        case ID.IconType.HEAVY_CRUISER:
-        case ID.IconType.TORPEDO_CRUISER:
+        case ID.ShipIconType.LIGHT_CRUISER:
+        case ID.ShipIconType.HEAVY_CRUISER:
+        case ID.ShipIconType.TORPEDO_CRUISER:
             return equipSlotsClass[1];
-        case ID.IconType.LIGHT_CARRIER:
-        case ID.IconType.STANDARD_CARRIER:
+        case ID.ShipIconType.LIGHT_CARRIER:
+        case ID.ShipIconType.STANDARD_CARRIER:
             return equipSlotsClass[2];
-        case ID.IconType.BATTLESHIP:
+        case ID.ShipIconType.BATTLESHIP:
             return equipSlotsClass[3];
-        case ID.IconType.TRANSPORT:
+        case ID.ShipIconType.TRANSPORT:
             return equipSlotsClass[4];
-        case ID.IconType.SUBMARINE:
+        case ID.ShipIconType.SUBMARINE:
             return equipSlotsClass[5];
-        case ID.IconType.DEMON:
+        case ID.ShipIconType.DEMON:
             return equipSlotsClass[6];
-        case ID.IconType.HIME:
+        case ID.ShipIconType.HIME:
             return equipSlotsClass[7];
         default:
             return 0;
