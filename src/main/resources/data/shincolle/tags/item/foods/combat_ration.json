@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "shincolle:combat_ration",
+    "shincolle:combat_ration_1",
+    "shincolle:combat_ration_2",
+    "shincolle:combat_ration_3",
+    "shincolle:combat_ration_4",
+    "shincolle:combat_ration_5"
+  ]
+}

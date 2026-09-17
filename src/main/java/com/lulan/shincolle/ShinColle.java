@@ -4,8 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.lulan.shincolle.config.ShinColleConfig;
+import com.lulan.shincolle.entity.BasicEntityShip;
+import com.lulan.shincolle.entity.BasicEntityShipHostile;
+import com.lulan.shincolle.entity.BasicEntitySummon;
 import com.lulan.shincolle.reference.Reference;
 import com.lulan.shincolle.registry.ModAttachments;
+import com.lulan.shincolle.registry.ModBlockEntities;
 import com.lulan.shincolle.registry.ModBlocks;
 import com.lulan.shincolle.registry.ModComponents;
 import com.lulan.shincolle.registry.ModEntities;
@@ -17,6 +21,7 @@ import com.lulan.shincolle.registry.ModTabs;
 import com.lulan.shincolle.registry.ShipClassRegistry;
 import com.lulan.shincolle.utility.LogHelper;
 
+import net.minecraft.world.entity.EntityType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -37,7 +42,7 @@ public class ShinColle
         //registry (deferred)
         ModBlocks.BLOCKS.register(modBus);
         ModBlocks.ITEMS.register(modBus);
-        ModBlocks.BLOCK_ENTITIES.register(modBus);
+        ModBlockEntities.BLOCK_ENTITIES.register(modBus);
         ModItems.ITEMS.register(modBus);
         ModEntities.ENTITY_TYPES.register(modBus);
         ModSounds.SOUNDS.register(modBus);
@@ -55,6 +60,42 @@ public class ShinColle
         modBus.addListener(this::commonSetup);
         modBus.addListener(this::onConfigLoad);
         modBus.addListener(this::onConfigReload);
+        modBus.addListener(this::registerAttributes);
+        modBus.addListener(this::registerSpawnPlacements);
+    }
+
+    /**
+     * Phase 2-11: hostile ships spawn on the ocean surface.
+     * IN_WATER placement + water check; actual spawn weights come from
+     * data/shincolle/neoforge/biome_modifier/add_mob_ship_spawns.json.
+     */
+    @SuppressWarnings("unchecked")
+    private void registerSpawnPlacements(
+            net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent event)
+    {
+        for (var entry : ModEntities.ENTITY_TYPES.getEntries())
+        {
+            EntityType<?> type = entry.get();
+            if (type.getCategory() == net.minecraft.world.entity.MobCategory.MONSTER)
+            {
+                event.register(
+                    (EntityType<? extends net.minecraft.world.entity.Mob>) type,
+                    net.minecraft.world.entity.SpawnPlacementTypes.IN_WATER,
+                    net.minecraft.world.level.levelgen.Heightmap.Types.OCEAN_FLOOR,
+                    (t, level, spawnType, pos, rand) ->
+                        level.getFluidState(pos).is(net.minecraft.tags.FluidTags.WATER)
+                        && level.getFluidState(pos.below()).is(net.minecraft.tags.FluidTags.WATER)
+                        && level.getFluidState(pos.above()).is(net.minecraft.tags.FluidTags.WATER),
+                    net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.AND);
+            }
+        }
+    }
+
+    /** Phase 2-9: entity attribute suppliers */
+    private void registerAttributes(
+            net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent event)
+    {
+        ModEntities.registerAttributes(event);
     }
 
     /** common init: custom INI configs, ship class table */
