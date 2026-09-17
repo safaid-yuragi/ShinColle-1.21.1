@@ -31,3 +31,4 @@ runs/
 logs/
 
 /.commandcode
+tools/__pycache__/
