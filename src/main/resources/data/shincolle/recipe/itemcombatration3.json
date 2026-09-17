@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "supplies",
+  "ingredients": [
+    {
+      "item": "shincolle:combat_ration_2"
+    },
+    {
+      "item": "shincolle:grudge_block"
+    },
+    {
+      "item": "shincolle:polymetal_gravel"
+    }
+  ],
+  "result": {
+    "id": "shincolle:combat_ration_3",
+    "count": 1
+  }
+}

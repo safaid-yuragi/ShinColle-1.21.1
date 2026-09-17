@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "machine",
+  "pattern": [
+    "mom",
+    "ogo",
+    "mom"
+  ],
+  "key": {
+    "m": {
+      "item": "shincolle:vol_block"
+    },
+    "g": {
+      "item": "shincolle:grudge_heavy_block"
+    },
+    "o": {
+      "tag": "c:obsidians"
+    }
+  },
+  "result": {
+    "id": "shincolle:vol_core",
+    "count": 1
+  }
+}

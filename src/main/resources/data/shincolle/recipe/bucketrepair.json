@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "supplies",
+  "ingredients": [
+    {
+      "item": "minecraft:lava_bucket"
+    },
+    {
+      "item": "shincolle:grudge"
+    }
+  ],
+  "result": {
+    "id": "shincolle:bucket_repair",
+    "count": 1
+  }
+}

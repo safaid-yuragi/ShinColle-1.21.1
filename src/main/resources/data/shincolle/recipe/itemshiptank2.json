@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "transport",
+  "pattern": [
+    "mtm",
+    "mtm",
+    "mtm"
+  ],
+  "key": {
+    "m": {
+      "item": "shincolle:abyssium_block"
+    },
+    "t": {
+      "item": "shincolle:ship_tank_1"
+    }
+  },
+  "result": {
+    "id": "shincolle:ship_tank_2",
+    "count": 1
+  }
+}

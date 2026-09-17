@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "machine",
+  "pattern": [
+    "glg",
+    "lol",
+    "ooo"
+  ],
+  "key": {
+    "g": {
+      "item": "shincolle:grudge"
+    },
+    "l": {
+      "item": "minecraft:lava_bucket"
+    },
+    "o": {
+      "tag": "c:obsidians"
+    }
+  },
+  "result": {
+    "id": "shincolle:small_shipyard",
+    "count": 1
+  }
+}

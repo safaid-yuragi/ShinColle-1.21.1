@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "misc",
+  "ingredients": [
+    {
+      "item": "shincolle:grudge_xp_block"
+    },
+    {
+      "item": "shincolle:grudge_xp_block"
+    },
+    {
+      "item": "shincolle:grudge_xp_block"
+    },
+    {
+      "item": "shincolle:grudge_xp_block"
+    },
+    {
+      "item": "shincolle:target_wrench"
+    },
+    {
+      "item": "shincolle:kaitai_hammer"
+    }
+  ],
+  "result": {
+    "id": "shincolle:modern_kit",
+    "count": 1
+  }
+}

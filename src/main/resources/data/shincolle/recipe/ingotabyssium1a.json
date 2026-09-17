@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "resources",
+  "ingredients": [
+    {
+      "tag": "c:ingots/iron"
+    },
+    {
+      "item": "shincolle:grudge"
+    }
+  ],
+  "result": {
+    "id": "shincolle:abyss_metal",
+    "count": 1
+  }
+}

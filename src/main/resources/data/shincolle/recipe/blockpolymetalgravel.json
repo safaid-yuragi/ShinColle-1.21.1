@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "resources",
+  "pattern": [
+    "aa",
+    "aa"
+  ],
+  "key": {
+    "a": {
+      "item": "shincolle:abyss_metal_1"
+    }
+  },
+  "result": {
+    "id": "shincolle:polymetal_gravel",
+    "count": 1
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "transport",
+  "pattern": [
+    "mtm",
+    "mtm",
+    "mtm"
+  ],
+  "key": {
+    "m": {
+      "tag": "c:obsidians"
+    },
+    "t": {
+      "item": "shincolle:ship_tank"
+    }
+  },
+  "result": {
+    "id": "shincolle:ship_tank_1",
+    "count": 1
+  }
+}

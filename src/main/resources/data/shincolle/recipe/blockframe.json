@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "misc",
+  "pattern": [
+    "a a",
+    " i ",
+    "a a"
+  ],
+  "key": {
+    "a": {
+      "item": "shincolle:abyss_metal"
+    },
+    "i": {
+      "tag": "c:obsidians"
+    }
+  },
+  "result": {
+    "id": "shincolle:frame_block",
+    "count": 16
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "tool",
+  "ingredients": [
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "item": "shincolle:grudge"
+    }
+  ],
+  "result": {
+    "id": "shincolle:owner_paper",
+    "count": 1
+  }
+}

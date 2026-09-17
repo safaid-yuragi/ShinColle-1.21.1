@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "machine",
+  "pattern": [
+    "abc",
+    "ooo",
+    "o o"
+  ],
+  "key": {
+    "a": {
+      "item": "shincolle:desk_item_radar"
+    },
+    "b": {
+      "item": "shincolle:desk_item_book"
+    },
+    "c": {
+      "item": "minecraft:black_wool"
+    },
+    "o": {
+      "tag": "c:obsidians"
+    }
+  },
+  "result": {
+    "id": "shincolle:desk_block",
+    "count": 1
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "supplies",
+  "pattern": [
+    "iii",
+    "iai",
+    "ibi"
+  ],
+  "key": {
+    "i": {
+      "tag": "c:ingots/gold"
+    },
+    "a": {
+      "item": "shincolle:grudge"
+    },
+    "b": {
+      "tag": "c:gunpowders"
+    }
+  },
+  "result": {
+    "id": "shincolle:ammo",
+    "count": 48
+  }
+}

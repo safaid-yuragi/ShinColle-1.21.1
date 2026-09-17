@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "resources",
+  "ingredients": [
+    {
+      "item": "shincolle:abyssium_block"
+    }
+  ],
+  "result": {
+    "id": "shincolle:abyss_metal",
+    "count": 9
+  }
+}

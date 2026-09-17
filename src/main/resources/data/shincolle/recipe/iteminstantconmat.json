@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "misc",
+  "pattern": [
+    " a ",
+    "aia",
+    " a "
+  ],
+  "key": {
+    "a": {
+      "item": "shincolle:abyss_metal"
+    },
+    "i": {
+      "item": "shincolle:grudge_block"
+    }
+  },
+  "result": {
+    "id": "shincolle:instant_con_mat",
+    "count": 1
+  }
+}

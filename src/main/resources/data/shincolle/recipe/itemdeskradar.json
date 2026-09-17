@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "tool",
+  "pattern": [
+    "ggg",
+    "gbg",
+    "ggg"
+  ],
+  "key": {
+    "g": {
+      "item": "shincolle:grudge"
+    },
+    "b": {
+      "item": "minecraft:compass"
+    }
+  },
+  "result": {
+    "id": "shincolle:desk_item_radar",
+    "count": 1
+  }
+}

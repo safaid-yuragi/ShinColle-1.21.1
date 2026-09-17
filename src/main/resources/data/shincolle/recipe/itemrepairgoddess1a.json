@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "supplies",
+  "pattern": [
+    "hgh",
+    "gdg",
+    "hgh"
+  ],
+  "key": {
+    "h": {
+      "item": "shincolle:grudge_heavy_block"
+    },
+    "g": {
+      "item": "shincolle:grudge_block"
+    },
+    "d": {
+      "tag": "c:storage_blocks/diamond"
+    }
+  },
+  "result": {
+    "id": "shincolle:repair_goddess",
+    "count": 1
+  }
+}

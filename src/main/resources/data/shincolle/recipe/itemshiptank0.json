@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "transport",
+  "pattern": [
+    "mtm",
+    "mtm",
+    "mtm"
+  ],
+  "key": {
+    "m": {
+      "item": "shincolle:abyss_metal_1"
+    },
+    "t": {
+      "item": "minecraft:cauldron"
+    }
+  },
+  "result": {
+    "id": "shincolle:ship_tank",
+    "count": 1
+  }
+}

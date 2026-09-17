@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "misc",
+  "ingredients": [
+    {
+      "type": "neoforge:components",
+      "items": "shincolle:ship_spawn_egg",
+      "components": {
+        "shincolle:ship_class": 1
+      }
+    },
+    {
+      "item": "shincolle:kaitai_hammer"
+    }
+  ],
+  "result": {
+    "id": "shincolle:instant_con_mat",
+    "count": 64
+  }
+}

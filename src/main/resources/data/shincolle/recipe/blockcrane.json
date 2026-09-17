@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "machine",
+  "pattern": [
+    "aaa",
+    "axa",
+    "aza"
+  ],
+  "key": {
+    "a": {
+      "item": "shincolle:abyss_metal"
+    },
+    "x": {
+      "item": "shincolle:grudge_block"
+    },
+    "z": {
+      "item": "minecraft:piston"
+    }
+  },
+  "result": {
+    "id": "shincolle:crane_block",
+    "count": 1
+  }
+}

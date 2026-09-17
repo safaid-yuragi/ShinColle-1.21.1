@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "tool",
+  "ingredients": [
+    {
+      "item": "shincolle:grudge"
+    },
+    {
+      "item": "minecraft:paper"
+    },
+    [
+      {
+        "tag": "c:gems/lapis"
+      },
+      {
+        "tag": "c:dyes/blue"
+      }
+    ]
+  ],
+  "result": {
+    "id": "shincolle:recipe_paper",
+    "count": 1
+  }
+}

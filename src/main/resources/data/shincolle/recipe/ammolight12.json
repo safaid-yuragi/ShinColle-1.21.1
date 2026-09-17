@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "supplies",
+  "pattern": [
+    "iii",
+    "iai",
+    "ibi"
+  ],
+  "key": {
+    "i": {
+      "tag": "c:ingots/bronze"
+    },
+    "a": {
+      "item": "shincolle:grudge"
+    },
+    "b": {
+      "tag": "c:gunpowders"
+    }
+  },
+  "result": {
+    "id": "shincolle:ammo",
+    "count": 12
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:tag_empty",
+        "tag": "c:ingots/bronze"
+      }
+    }
+  ]
+}

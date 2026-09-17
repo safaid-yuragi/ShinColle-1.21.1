@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "misc",
+  "pattern": [
+    " s ",
+    "a a",
+    " a "
+  ],
+  "key": {
+    "s": {
+      "tag": "c:nether_stars"
+    },
+    "a": {
+      "item": "shincolle:abyss_nugget"
+    }
+  },
+  "result": {
+    "id": "shincolle:marriage_ring",
+    "count": 1
+  }
+}
