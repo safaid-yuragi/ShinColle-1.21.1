@@ -42,6 +42,18 @@ public interface IShipState
         }
     }
 
+    /** flag as int for GUI field sync */
+    default int getStateFlagI(int id)
+    {
+        return stateFlags()[id] ? 1 : 0;
+    }
+
+    /** set flag from int for GUI field sync */
+    default void setStateFlagI(int id, int value)
+    {
+        setStateFlag(id, value != 0);
+    }
+
     default int getStateMinor(int id)
     {
         return stateMinor()[id];

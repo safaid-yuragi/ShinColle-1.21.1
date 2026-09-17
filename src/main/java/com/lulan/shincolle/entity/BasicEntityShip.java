@@ -24,6 +24,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -334,6 +335,139 @@ abstract public class BasicEntityShip extends TamableAnimal implements IShipGuar
         return this.shipInventory;
     }
 
+    /** GUI inventory page 0~5 (6 pages x 9 slots) */
+    protected int inventoryPage = 0;
+
+    public int getInventoryPage()
+    {
+        return this.inventoryPage;
+    }
+
+    public void setInventoryPage(int page)
+    {
+        this.inventoryPage = Math.clamp(page, 0, 5);
+    }
+
+    /**
+     * get/setField for GUI container sync.
+     * Same method reads/writes all state values by index so menus can use
+     * ContainerData instead of per-value packets. Field map mirrors legacy 1.12.2.
+     */
+    public int getFieldCount()
+    {
+        return 35;
+    }
+
+    public int getField(int id)
+    {
+        return switch (id)
+        {
+            case 0  -> this.getStateMinor(ID.M.ExpCurrent);
+            case 1  -> this.getStateMinor(ID.M.NumAmmoLight);
+            case 2  -> this.getStateMinor(ID.M.NumAmmoHeavy);
+            case 3  -> this.getStateMinor(ID.M.NumAirLight);
+            case 4  -> this.getStateMinor(ID.M.NumAirHeavy);
+            case 5  -> this.getStateFlagI(ID.F.UseMelee);
+            case 6  -> this.getStateFlagI(ID.F.UseAmmoLight);
+            case 7  -> this.getStateFlagI(ID.F.UseAmmoHeavy);
+            case 8  -> this.getStateFlagI(ID.F.UseAirLight);
+            case 9  -> this.getStateFlagI(ID.F.UseAirHeavy);
+            case 10 -> this.getStateFlagI(ID.F.IsMarried);
+            case 11 -> this.getStateMinor(ID.M.FollowMin);
+            case 12 -> this.getStateMinor(ID.M.FollowMax);
+            case 13 -> this.getStateMinor(ID.M.FleeHP);
+            case 14 -> this.getStateFlagI(ID.F.PassiveAI);
+            case 15 -> this.getStateFlagI(ID.F.UseRingEffect);
+            case 16 -> this.getStateFlagI(ID.F.OnSightChase);
+            case 17 -> this.getStateFlagI(ID.F.PVPFirst);
+            case 18 -> this.getStateFlagI(ID.F.AntiAir);
+            case 19 -> this.getStateFlagI(ID.F.AntiSS);
+            case 20 -> this.getStateFlagI(ID.F.TimeKeeper);
+            case 21 -> this.getMorale();
+            case 22 -> this.getStateMinor(ID.M.DrumState);
+            case 23 -> this.getStateFlagI(ID.F.PickItem);
+            case 24 -> this.getStateMinor(ID.M.WpStay);
+            case 25 -> this.getStateMinor(ID.M.Kills);
+            case 26 -> this.getStateMinor(ID.M.NumGrudge);
+            case 27 -> this.getInventoryPage();
+            case 28 -> this.getStateFlagI(ID.F.ShowHeldItem);
+            case 29 -> this.getStateMinor(ID.M.UseCombatRation);
+            case 30 -> this.getStateFlagI(ID.F.AutoPump);
+            case 31 -> this.getStateEmotion(ID.S.State);
+            case 32 -> this.getStateMinor(ID.M.Task);
+            case 33 -> this.getStateMinor(ID.M.TaskSide);
+            case 34 -> this.getStateFlagI(ID.F.NoFuel);		//for morph entity
+            default -> 0;
+        };
+    }
+
+    public void setField(int id, int value)
+    {
+        switch (id)
+        {
+        case 0:  this.setStateMinor(ID.M.ExpCurrent, value);		break;
+        case 1:  this.setStateMinor(ID.M.NumAmmoLight, value);		break;
+        case 2:  this.setStateMinor(ID.M.NumAmmoHeavy, value);		break;
+        case 3:  this.setStateMinor(ID.M.NumAirLight, value);		break;
+        case 4:  this.setStateMinor(ID.M.NumAirHeavy, value);		break;
+        case 5:  this.setStateFlagI(ID.F.UseMelee, value);			break;
+        case 6:  this.setStateFlagI(ID.F.UseAmmoLight, value);		break;
+        case 7:  this.setStateFlagI(ID.F.UseAmmoHeavy, value);		break;
+        case 8:  this.setStateFlagI(ID.F.UseAirLight, value);		break;
+        case 9:  this.setStateFlagI(ID.F.UseAirHeavy, value);		break;
+        case 10: this.setStateFlagI(ID.F.IsMarried, value);			break;
+        case 11: this.setStateMinor(ID.M.FollowMin, value);			break;
+        case 12: this.setStateMinor(ID.M.FollowMax, value);			break;
+        case 13: this.setStateMinor(ID.M.FleeHP, value);			break;
+        case 14: this.setStateFlagI(ID.F.PassiveAI, value);			break;
+        case 15: this.setStateFlagI(ID.F.UseRingEffect, value);		break;
+        case 16: this.setStateFlagI(ID.F.OnSightChase, value);		break;
+        case 17: this.setStateFlagI(ID.F.PVPFirst, value);			break;
+        case 18: this.setStateFlagI(ID.F.AntiAir, value);			break;
+        case 19: this.setStateFlagI(ID.F.AntiSS, value);			break;
+        case 20: this.setStateFlagI(ID.F.TimeKeeper, value);		break;
+        case 21: this.setMorale(value);								break;
+        case 22: this.setStateMinor(ID.M.DrumState, value);			break;
+        case 23: this.setStateFlagI(ID.F.PickItem, value);			break;
+        case 24: this.setStateMinor(ID.M.WpStay, value);			break;
+        case 25: this.setStateMinor(ID.M.Kills, value);				break;
+        case 26: this.setStateMinor(ID.M.NumGrudge, value);			break;
+        case 27: this.setInventoryPage(value);						break;
+        case 28: this.setStateFlagI(ID.F.ShowHeldItem, value);		break;
+        case 29: this.setStateMinor(ID.M.UseCombatRation, value);	break;
+        case 30: this.setStateFlagI(ID.F.AutoPump, value);			break;
+        case 31: this.setStateEmotion(ID.S.State, value, false);	break;
+        case 32: this.setStateMinor(ID.M.Task, value);				break;
+        case 33: this.setStateMinor(ID.M.TaskSide, value);			break;
+        case 34: this.setStateFlagI(ID.F.NoFuel, value);			break;	//for morph entity
+        }
+    }
+
+    /** ContainerData view of {@link #getField}/{@link #setField} for menu addDataSlots */
+    public net.minecraft.world.inventory.ContainerData getFieldData()
+    {
+        return new net.minecraft.world.inventory.ContainerData()
+        {
+            @Override
+            public int get(int index)
+            {
+                return BasicEntityShip.this.getField(index);
+            }
+
+            @Override
+            public void set(int index, int value)
+            {
+                BasicEntityShip.this.setField(index, value);
+            }
+
+            @Override
+            public int getCount()
+            {
+                return BasicEntityShip.this.getFieldCount();
+            }
+        };
+    }
+
     public AttrsAdv getAttrs()
     {
         return this.shipAttrs;
@@ -559,7 +693,7 @@ abstract public class BasicEntityShip extends TamableAnimal implements IShipGuar
             {
                 if (player.isShiftKeyDown())
                 {
-                    //open GUI (Phase 6); fall through to sit toggle for now
+                    this.openShipInventory(player);
                     return InteractionResult.SUCCESS;
                 }
 
@@ -573,6 +707,18 @@ abstract public class BasicEntityShip extends TamableAnimal implements IShipGuar
         }
 
         return InteractionResult.PASS;
+    }
+
+    /** open ship inventory GUI for the owner (server side) */
+    public void openShipInventory(Player player)
+    {
+        if (!this.level().isClientSide && player instanceof ServerPlayer sp)
+        {
+            sp.openMenu(new net.minecraft.world.SimpleMenuProvider(
+                (id, inv, p) -> new com.lulan.shincolle.menu.ShipInventoryMenu(id, inv, this),
+                net.minecraft.network.chat.Component.translatable("gui.shincolle.ship_inventory")),
+                buf -> buf.writeInt(this.getId()));
+        }
     }
 
     /** feed ship: grudge/ammo items refill NumGrudge/NumAmmo */

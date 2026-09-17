@@ -335,4 +335,13 @@ public class TileEntityVolCore extends BasicBlockEntity
     }
 
 
+    @Override
+    public net.minecraft.world.inventory.AbstractContainerMenu createMenu(
+        int containerId, net.minecraft.world.entity.player.Inventory inv,
+        net.minecraft.world.entity.player.Player player)
+    {
+        return new com.lulan.shincolle.menu.VolCoreMenu(containerId, inv, this);
+    }
+
+
 }

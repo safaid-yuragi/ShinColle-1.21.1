@@ -677,4 +677,13 @@ public class TileMultiGrudgeHeavy extends BasicMultiBlockEntity
     }
 
 
+    @Override
+    public net.minecraft.world.inventory.AbstractContainerMenu createMenu(
+        int containerId, net.minecraft.world.entity.player.Inventory inv,
+        net.minecraft.world.entity.player.Player player)
+    {
+        return new com.lulan.shincolle.menu.LargeShipyardMenu(containerId, inv, this);
+    }
+
+
 }

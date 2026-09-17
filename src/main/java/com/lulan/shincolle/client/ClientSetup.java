@@ -26,6 +26,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -215,6 +216,24 @@ public final class ClientSetup
     {
         event.register(ClientInputHandler.KEY_DEBUG_UNATK);
         event.register(ClientInputHandler.KEY_DEBUG_UNATK_LIST);
+    }
+
+    /** menu -> screen factories (Phase 6) */
+    @SubscribeEvent
+    public static void registerScreens(RegisterMenuScreensEvent event)
+    {
+        event.register(com.lulan.shincolle.registry.ModMenus.SHIP_INVENTORY.get(),
+            com.lulan.shincolle.client.gui.screen.ShipInventoryScreen::new);
+        event.register(com.lulan.shincolle.registry.ModMenus.VOLCORE.get(),
+            com.lulan.shincolle.client.gui.screen.VolCoreScreen::new);
+        event.register(com.lulan.shincolle.registry.ModMenus.SMALL_SHIPYARD.get(),
+            com.lulan.shincolle.client.gui.screen.SmallShipyardScreen::new);
+        event.register(com.lulan.shincolle.registry.ModMenus.LARGE_SHIPYARD.get(),
+            com.lulan.shincolle.client.gui.screen.LargeShipyardScreen::new);
+        event.register(com.lulan.shincolle.registry.ModMenus.CRANE.get(),
+            com.lulan.shincolle.client.gui.screen.CraneScreen::new);
+        event.register(com.lulan.shincolle.registry.ModMenus.DESK.get(),
+            com.lulan.shincolle.client.gui.screen.DeskScreen::new);
     }
 
 

@@ -158,6 +158,15 @@ abstract public class BasicBlockEntity extends BlockEntity
         return this.fields.length;
     }
 
+    /**
+     * whether a stack may be placed into slot by the GUI/hopper.
+     * default denies insertion; concrete tiles override.
+     */
+    public boolean isItemValidForSlot(int slot, ItemStack stack)
+    {
+        return false;
+    }
+
     /** ContainerData view of {@link #fields} for menu addDataSlots */
     public net.minecraft.world.inventory.ContainerData getFieldData()
     {
