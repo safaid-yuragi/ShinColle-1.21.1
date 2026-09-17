@@ -6,6 +6,7 @@ license = "MIT"
 modId = "shincolle"
 version = "${mod_version}"
 displayName = "Shinkeiseikan Collection"
+displayURL = "https://github.com/PinkaLulan/ShinColle"
 description = '''Collect cute SeiKan mobs!'''
 authors = "PinkaLulan"
 logoFile = "shincolle.png"
