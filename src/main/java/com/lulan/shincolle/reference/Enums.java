@@ -187,78 +187,13 @@ public class Enums
      */
     public static enum AtkType
     {
-        /** direct attack */
-        GENERIC_MELEE(false, true, true, true, true, false),
-        /** direct attack */
-        GENERIC_LIGHT(false, true, true, true, true, false),
-        /** summon */
-        GENERIC_HEAVY_LAUNCH(true, true, false, false, false, true),
-        /** collide attack */
-        GENERIC_HEAVY_COLLIDE(false, true, true, true, true, false),
-        /** summon */
-        GENERIC_AIR_LIGHT_LAUNCH(false, false, false, false, false, true),
-        /** direct attack */
-        GENERIC_AIR_LIGHT_ATTACK(false, true, true, true, true, false),
-        /** summon */
-        GENERIC_AIR_HEAVY_LAUNCH(true, false, false, false, false, true),
-        /** collide attack */
-        GENERIC_AIR_HEAVY_COLLIDE(false, true, true, true, true, false),
-        /** summon */
-        YAMATO_CANNON_LAUNCH(true, false, false, false, false, true),
-        /** collide attack */
-        YAMATO_CANNON_COLLIDE(false, true, true, true, true, false),
-        /** direct attack */
-        AP91_FIST(true, true, true, true, true, false);
-        
-        private final boolean canHitGround;  //can attack without Entity target
-        private final boolean canMiss;       //can miss
-        private final boolean canCri;        //can critical hit
-        private final boolean canDHit;       //can double hit
-        private final boolean canTHit;       //can triple hit
-        private final boolean justLaunch;    //just launch object
-        
-        
-        private AtkType(boolean canHitGround, boolean canMiss, boolean canCri,
-                        boolean canDHit, boolean canTHit, boolean justLaunch)
-        {
-            this.canHitGround = canHitGround;
-            this.canMiss = canMiss;
-            this.canCri = canCri;
-            this.canDHit = canDHit;
-            this.canTHit = canTHit;
-            this.justLaunch = justLaunch;
-        }
-        
-        public boolean canHitGround()
-        {
-            return this.canHitGround;
-        }
-        
-        public boolean canMiss()
-        {
-            return this.canMiss;
-        }
-
-        public boolean canCri()
-        {
-            return this.canCri;
-        }
-        
-        public boolean canDHit()
-        {
-            return this.canDHit;
-        }
-        
-        public boolean canTHit()
-        {
-            return this.canTHit;
-        }
-        
-        public boolean justLaunch()
-        {
-            return this.justLaunch;
-        }
-        
+        GENERIC_MELEE,
+        GENERIC_LIGHT,
+        GENERIC_HEAVY,
+        GENERIC_AIR_LIGHT,
+        GENERIC_AIR_HEAVY,
+        YAMATO_CANNON,
+        AP91_FIST
     }
     
     /**

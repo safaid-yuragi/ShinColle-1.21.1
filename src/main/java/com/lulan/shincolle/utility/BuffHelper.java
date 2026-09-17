@@ -215,5 +215,89 @@ public class BuffHelper
         attrs.setAttrsMorale(Arrays.copyOf(buff, buff.length));
     }
 
+    /** get specific potion level from buff map, return 0 if no such buff */
+    public static int getPotionLevel(java.util.Map<Integer, Integer> buffmap, int pid)
+    {
+        if (buffmap != null)
+        {
+            return buffmap.containsKey(pid) ? buffmap.get(pid) + 1 : 0;
+        }
+
+        return 0;
+    }
+
+    /** get specific potion level from IShipAttackBase's buff map */
+    public static int getPotionLevel(net.minecraft.world.entity.Entity host, int pid)
+    {
+        if (host instanceof com.lulan.shincolle.entity.IShipAttackBase ship)
+        {
+            return getPotionLevel(ship.getBuffMap(), pid);
+        }
+
+        return 0;
+    }
+
+    /** apply ship attack effect map (potion id -> {amp, ticks, chance%}) */
+    public static void applyBuffOnTarget(net.minecraft.world.entity.Entity target,
+            java.util.Map<Integer, int[]> effects)
+    {
+        if (target instanceof net.minecraft.world.entity.LivingEntity ent &&
+            effects != null && !effects.isEmpty())
+        {
+            effects.forEach((id, content) ->
+            {
+                var holder = convertIdToPotion(id);
+                if (holder != null && ent.getRandom().nextInt(100) < content[2])
+                {
+                    int ticks = (id == 6 || id == 7) ? 5 : content[1];
+                    ent.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                        holder, ticks, content[0]));
+                }
+            });
+        }
+    }
+
+    /** legacy potion id (1.7.10-1.12 numeric) -> MobEffect holder */
+    public static net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect>
+            convertIdToPotion(int id)
+    {
+        var eff = switch (id)
+        {
+            case 1 -> net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED;
+            case 2 -> net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN;
+            case 3 -> net.minecraft.world.effect.MobEffects.DIG_SPEED;
+            case 4 -> net.minecraft.world.effect.MobEffects.DIG_SLOWDOWN;
+            case 5 -> net.minecraft.world.effect.MobEffects.DAMAGE_BOOST;
+            case 6 -> net.minecraft.world.effect.MobEffects.HEAL;
+            case 7 -> net.minecraft.world.effect.MobEffects.HARM;
+            case 8 -> net.minecraft.world.effect.MobEffects.JUMP;
+            case 9 -> net.minecraft.world.effect.MobEffects.CONFUSION;
+            case 10 -> net.minecraft.world.effect.MobEffects.REGENERATION;
+            case 11 -> net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE;
+            case 12 -> net.minecraft.world.effect.MobEffects.FIRE_RESISTANCE;
+            case 13 -> net.minecraft.world.effect.MobEffects.WATER_BREATHING;
+            case 14 -> net.minecraft.world.effect.MobEffects.INVISIBILITY;
+            case 15 -> net.minecraft.world.effect.MobEffects.BLINDNESS;
+            case 16 -> net.minecraft.world.effect.MobEffects.NIGHT_VISION;
+            case 17 -> net.minecraft.world.effect.MobEffects.HUNGER;
+            case 18 -> net.minecraft.world.effect.MobEffects.WEAKNESS;
+            case 19 -> net.minecraft.world.effect.MobEffects.POISON;
+            case 20 -> net.minecraft.world.effect.MobEffects.WITHER;
+            case 21 -> net.minecraft.world.effect.MobEffects.HEALTH_BOOST;
+            case 22 -> net.minecraft.world.effect.MobEffects.ABSORPTION;
+            case 23 -> net.minecraft.world.effect.MobEffects.SATURATION;
+            case 24 -> net.minecraft.world.effect.MobEffects.GLOWING;
+            case 25 -> net.minecraft.world.effect.MobEffects.LEVITATION;
+            case 26 -> net.minecraft.world.effect.MobEffects.LUCK;
+            case 27 -> net.minecraft.world.effect.MobEffects.UNLUCK;
+            case 28 -> net.minecraft.world.effect.MobEffects.SLOW_FALLING;
+            case 29 -> net.minecraft.world.effect.MobEffects.CONDUIT_POWER;
+            case 30 -> net.minecraft.world.effect.MobEffects.DOLPHINS_GRACE;
+            default -> null;
+        };
+
+        return eff;
+    }
+
 
 }
