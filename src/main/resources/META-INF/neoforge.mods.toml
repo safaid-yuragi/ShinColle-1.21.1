@@ -1,0 +1,25 @@
+modLoader = "javafml"
+loaderVersion = "${loader_version_range}"
+license = "MIT"
+
+[[mods]]
+modId = "shincolle"
+version = "${mod_version}"
+displayName = "Shinkeiseikan Collection"
+description = '''Collect cute SeiKan mobs!'''
+authors = "PinkaLulan"
+logoFile = "shincolle.png"
+
+[[dependencies.shincolle]]
+modId = "neoforge"
+type = "required"
+versionRange = "${neo_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.shincolle]]
+modId = "minecraft"
+type = "required"
+versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"
