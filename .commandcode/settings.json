@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Shell(find:*)",
+      "Shell(ls:*)",
+      "Shell(cat:*)",
+      "Shell(cd /home/safaid_yuragi/develop/ShinColle-1.21.1 && for d in ai block capability client command config crafting creativetab entity handler init item network playerskill proxy reference server team tileentity utility worldgen; do n=$(find src/main/java/com/lulan/shincolle/$d -name \"*.java\" | wc -l); l=$(find src/main/java/com/lulan/shincolle/$d -name \"*.java\" -exec cat {} + | wc -l); echo \"$d: $n files, $l lines\"; done)",
+      "Shell(cd /home/safaid_yuragi/develop/ShinColle-1.21.1/src/main/java && for p in \"getTagCompound\" \"NBTTagCompound\" \"IBlockState\" \"EnumFacing\" \"GameRegistry\" \"SimpleNetworkWrapper\" \"Capability\" \"EntityDataManager\" \"EntityAIBase\" \"EntityAITasks\" \"GuiContainer\" \"IRecipe\" \"TileEntitySpecialRenderer\" \"GlStateManager\" \"ObfuscationReflectionHelper\" \"net.minecraftforge\" \"ITextComponent\" \"IContainerFactory\" \"IGuiHandler\" \"IInventory\" \"EntityRegistry\" \"SharedMonsterAttributes\" \"EntityAttributeModifier\" \"IWorldGenerator\" \"OreDictionary\" \"ItemSword\\|ItemTool\\|ItemArmor\" \"IExtendedEntityProperties\" \"DataParameter\" \"MinecraftForge.EVENT\" \"Loader\" \"FML\" \"Techne\\|ModelBase\" \"WavefrontObject\\|OBJModel\" \"RenderLayer\" \"ITileEntityProvider\" \"WorldServer\" \"EntityPlayer\" \"EntityLivingBase\" \"MathHelper\" \"ItemStack\" \"NBTTagList\"; do c=$(grep -rIl \"$p\" . 2>/dev/null | wc -l); echo \"$p : $c files\"; done)",
+      "Shell(cd /home/safaid_yuragi/develop/ShinColle-1.21.1/src/main/resources && echo \"=== top-level ===\" && ls -la && echo \"=== assets/shincolle ===\" && ls assets/shincolle && echo \"=== find sounds.json ===\" && find . -name \"*.json\" -path \"*sound*\" -o -name \"sounds.json\" | head && echo \"=== recipes count ===\" && ls assets/shincolle/recipes | wc -l && echo \"=== lang files ===\" && ls assets/shincolle/lang && echo \"=== blockstates ===\" && ls assets/shincolle/blockstates | head -20 && echo \"=== sample recipe ===\" && cat assets/shincolle/recipes/$(ls assets/shincolle/recipes | head -1))"
+    ],
+    "deny": [],
+    "defaultMode": "default"
+  }
+}
