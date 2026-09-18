@@ -17,6 +17,7 @@ public class EntityNorthernHime extends BasicEntityShipCV
     public EntityNorthernHime(EntityType<? extends BasicEntityShip> type, Level level)
     {
         super(type, level);
+        this.modelPosInGUI = new float[] {-6F, 8F, 0F, 50F};
         this.setStateMinor(ID.M.ShipType, ID.ShipIconType.HIME);
         this.setStateMinor(ID.M.ShipClass, ID.ShipClass.NorthernHime);
         this.setStateMinor(ID.M.DamageType, ID.ShipDmgType.AVIATION);

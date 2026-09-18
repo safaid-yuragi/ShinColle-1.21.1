@@ -17,6 +17,7 @@ public class EntityCLTatsuta extends BasicEntityShipSmall
     public EntityCLTatsuta(EntityType<? extends BasicEntityShip> type, Level level)
     {
         super(type, level);
+        this.modelPosInGUI = new float[] {0F, 22F, 0F, 42F};
         this.setStateMinor(ID.M.ShipType, ID.ShipIconType.LIGHT_CRUISER);
         this.setStateMinor(ID.M.ShipClass, ID.ShipClass.CLTatsuta);
         this.setStateMinor(ID.M.DamageType, ID.ShipDmgType.CRUISER);

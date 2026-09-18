@@ -17,6 +17,7 @@ public class EntitySubmYo extends BasicEntityShipSmall
     public EntitySubmYo(EntityType<? extends BasicEntityShip> type, Level level)
     {
         super(type, level);
+        this.modelPosInGUI = new float[] {0F, 25F, 0F, 45F};
         this.setStateMinor(ID.M.ShipType, ID.ShipIconType.SUBMARINE);
         this.setStateMinor(ID.M.ShipClass, ID.ShipClass.SSYO);
         this.setStateMinor(ID.M.DamageType, ID.ShipDmgType.SUBMARINE);

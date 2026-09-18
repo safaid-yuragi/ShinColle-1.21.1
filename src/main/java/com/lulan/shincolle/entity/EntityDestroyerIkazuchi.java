@@ -17,6 +17,7 @@ public class EntityDestroyerIkazuchi extends BasicEntityShipSmall
     public EntityDestroyerIkazuchi(EntityType<? extends BasicEntityShip> type, Level level)
     {
         super(type, level);
+        this.modelPosInGUI = new float[] {0F, 25F, 0F, 50F};
         this.setStateMinor(ID.M.ShipType, ID.ShipIconType.DESTROYER);
         this.setStateMinor(ID.M.ShipClass, ID.ShipClass.DDIkazuchi);
         this.setStateMinor(ID.M.DamageType, ID.ShipDmgType.DESTROYER);

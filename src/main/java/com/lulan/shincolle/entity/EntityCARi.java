@@ -17,6 +17,7 @@ public class EntityCARi extends BasicEntityShipSmall
     public EntityCARi(EntityType<? extends BasicEntityShip> type, Level level)
     {
         super(type, level);
+        this.modelPosInGUI = new float[] {0F, 20F, 0F, 40F};
         this.setStateMinor(ID.M.ShipType, ID.ShipIconType.HEAVY_CRUISER);
         this.setStateMinor(ID.M.ShipClass, ID.ShipClass.CARI);
         this.setStateMinor(ID.M.DamageType, ID.ShipDmgType.CRUISER);

@@ -17,6 +17,7 @@ public class EntityHarbourHime extends BasicEntityShipCV
     public EntityHarbourHime(EntityType<? extends BasicEntityShip> type, Level level)
     {
         super(type, level);
+        this.modelPosInGUI = new float[] {-6F, 30F, 0F, 40F};
         this.setStateMinor(ID.M.ShipType, ID.ShipIconType.HIME);
         this.setStateMinor(ID.M.ShipClass, ID.ShipClass.HarbourHime);
         this.setStateMinor(ID.M.DamageType, ID.ShipDmgType.AVIATION);

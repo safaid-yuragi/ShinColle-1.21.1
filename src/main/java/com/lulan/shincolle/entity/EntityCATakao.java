@@ -17,6 +17,7 @@ public class EntityCATakao extends BasicEntityShipSmall
     public EntityCATakao(EntityType<? extends BasicEntityShip> type, Level level)
     {
         super(type, level);
+        this.modelPosInGUI = new float[] {0F, 25F, 0F, 40F};
         this.setStateMinor(ID.M.ShipType, ID.ShipIconType.HEAVY_CRUISER);
         this.setStateMinor(ID.M.ShipClass, ID.ShipClass.CATakao);
         this.setStateMinor(ID.M.DamageType, ID.ShipDmgType.CRUISER);

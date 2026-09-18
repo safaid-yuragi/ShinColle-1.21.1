@@ -17,6 +17,7 @@ public class EntityCarrierAkagi extends BasicEntityShipCV
     public EntityCarrierAkagi(EntityType<? extends BasicEntityShip> type, Level level)
     {
         super(type, level);
+        this.modelPosInGUI = new float[] {0F, 20F, 0F, 40F};
         this.setStateMinor(ID.M.ShipType, ID.ShipIconType.STANDARD_CARRIER);
         this.setStateMinor(ID.M.ShipClass, ID.ShipClass.CVAkagi);
         this.setStateMinor(ID.M.DamageType, ID.ShipDmgType.CARRIER);

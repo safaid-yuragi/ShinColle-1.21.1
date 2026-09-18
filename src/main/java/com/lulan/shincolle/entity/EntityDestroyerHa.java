@@ -17,6 +17,7 @@ public class EntityDestroyerHa extends BasicEntityShipSmall
     public EntityDestroyerHa(EntityType<? extends BasicEntityShip> type, Level level)
     {
         super(type, level);
+        this.modelPosInGUI = new float[] {0F, 0F, 0F, 25F};
         this.setStateMinor(ID.M.ShipType, ID.ShipIconType.DESTROYER);
         this.setStateMinor(ID.M.ShipClass, ID.ShipClass.DDHA);
         this.setStateMinor(ID.M.DamageType, ID.ShipDmgType.DESTROYER);

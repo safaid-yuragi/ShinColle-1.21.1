@@ -17,6 +17,7 @@ public class EntityBattleshipTa extends BasicEntityShip
     public EntityBattleshipTa(EntityType<? extends BasicEntityShip> type, Level level)
     {
         super(type, level);
+        this.modelPosInGUI = new float[] {0F, 25F, 0F, 40F};
         this.setStateMinor(ID.M.ShipType, ID.ShipIconType.BATTLESHIP);
         this.setStateMinor(ID.M.ShipClass, ID.ShipClass.BBTA);
         this.setStateMinor(ID.M.DamageType, ID.ShipDmgType.BATTLESHIP);

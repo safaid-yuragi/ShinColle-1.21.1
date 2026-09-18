@@ -17,6 +17,7 @@ public class EntityDestroyerAkatsuki extends BasicEntityShipSmall
     public EntityDestroyerAkatsuki(EntityType<? extends BasicEntityShip> type, Level level)
     {
         super(type, level);
+        this.modelPosInGUI = new float[] {0F, 25F, 0F, 50F};
         this.setStateMinor(ID.M.ShipType, ID.ShipIconType.DESTROYER);
         this.setStateMinor(ID.M.ShipClass, ID.ShipClass.DDAkatsuki);
         this.setStateMinor(ID.M.DamageType, ID.ShipDmgType.DESTROYER);

@@ -17,6 +17,7 @@ public class EntityCarrierWo extends BasicEntityShipCV
     public EntityCarrierWo(EntityType<? extends BasicEntityShip> type, Level level)
     {
         super(type, level);
+        this.modelPosInGUI = new float[] {0F, 20F, 0F, 30F};
         this.setStateMinor(ID.M.ShipType, ID.ShipIconType.STANDARD_CARRIER);
         this.setStateMinor(ID.M.ShipClass, ID.ShipClass.CVWO);
         this.setStateMinor(ID.M.DamageType, ID.ShipDmgType.CARRIER);

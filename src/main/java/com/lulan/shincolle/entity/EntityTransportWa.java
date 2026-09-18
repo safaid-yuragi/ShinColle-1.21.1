@@ -17,6 +17,7 @@ public class EntityTransportWa extends BasicEntityShipSmall
     public EntityTransportWa(EntityType<? extends BasicEntityShip> type, Level level)
     {
         super(type, level);
+        this.modelPosInGUI = new float[] {-3F, 20F, 0F, 45F};
         this.setStateMinor(ID.M.ShipType, ID.ShipIconType.TRANSPORT);
         this.setStateMinor(ID.M.ShipClass, ID.ShipClass.APWA);
         this.setStateMinor(ID.M.DamageType, ID.ShipDmgType.UNDEFINED);
