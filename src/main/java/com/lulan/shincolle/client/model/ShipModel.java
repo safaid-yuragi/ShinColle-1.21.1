@@ -1,6 +1,8 @@
 package com.lulan.shincolle.client.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -113,8 +115,11 @@ public abstract class ShipModel<T extends Entity> extends EntityModel<T>
         final Quaternionf rot = this.animRot;
         final float[] maxRotY = {Float.NEGATIVE_INFINITY};
         final Vector3f tv = new Vector3f();
+        final Map<String,Boolean> visCache = new HashMap<>();
         this.modelRoot.visit(new PoseStack(), (pose, path, index, cube) ->
         {
+            // skip cubes belonging to parts that won't actually be drawn this frame
+            if (!visCache.computeIfAbsent(path, this::partRenders)) return;
             for (int c = 0; c < 8; c++)
             {
                 float cx = ((c & 1) == 0 ? cube.minX : cube.maxX) / 16F;
@@ -130,7 +135,8 @@ public abstract class ShipModel<T extends Entity> extends EntityModel<T>
         // rotate the accumulated translate into rendered space
         float transDownY = new Vector3f(this.animTransX, this.animTransY, this.animTransZ)
             .rotate(rot).y;
-        float gap = GROUND_BASE - this.animScaleY * (maxRotY[0] + transDownY);
+        float reach = this.animScaleY * (maxRotY[0] + transDownY);
+        float gap = GROUND_BASE - reach;
         if (gap <= 1.0E-4F) return;
 
         // shift down by exactly the gap, expressed back in pre-rotation translate space
@@ -139,6 +145,25 @@ public abstract class ShipModel<T extends Entity> extends EntityModel<T>
         this.animTransX += d.x;
         this.animTransY += d.y;
         this.animTransZ += d.z;
+    }
+
+    /**
+     * Whether the part at the given visit path actually draws cubes this frame.
+     * ModelPart.visit ignores visibility, so we resolve "/A/B/C" and require every
+     * ancestor to be visible (an invisible part drops its whole subtree) plus the
+     * owning part itself visible and not skipDraw.
+     */
+    private boolean partRenders(String path)
+    {
+        ModelPart p = this.modelRoot;
+        if (p == null) return false;
+        for (String seg : path.split("/"))
+        {
+            if (seg.isEmpty()) continue;
+            if (!p.visible || !p.hasChild(seg)) return false;
+            p = p.getChild(seg);
+        }
+        return p.visible && !p.skipDraw;
     }
 
     /** capture entity for use in renderToBuffer (which has no entity parm) */
