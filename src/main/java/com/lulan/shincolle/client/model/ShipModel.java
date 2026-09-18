@@ -3,6 +3,7 @@ package com.lulan.shincolle.client.model;
 import java.util.ArrayList;
 
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -59,6 +60,9 @@ public abstract class ShipModel<T extends Entity> extends EntityModel<T>
     public float animScaleX = 1F, animScaleY = 1F, animScaleZ = 1F;
     public Quaternionf animRot = new Quaternionf();
 
+    /** baked model root, set by ShipRenderer for ground measurement */
+    public ModelPart modelRoot;
+
 
     public ShipModel() {}
 
@@ -76,12 +80,65 @@ public abstract class ShipModel<T extends Entity> extends EntityModel<T>
         this.animRot.identity();
     }
 
+    /** entity-foot baseline used by LivingEntityRenderer (blocks below origin) */
+    private static final float GROUND_BASE = 1.501F;
+
+    /** true while an inventory screen renders a model preview; skips grounding so
+     *  the per-ship modelPosInGUI placement is not disturbed */
+    public static boolean inGuiPreview = false;
+
     /** called at top of generated renderToBuffer: apply anim transform + locals */
     public float[] beginRender()
     {
         this.glowLight = false;
+        this.groundToBaseline();
         return new float[] {this.animLimbSwing, this.animLimbSwingAmount,
                             this.animAgeInTicks, this.animNetHeadYaw, this.animHeadPitch};
+    }
+
+    /**
+     * Push the model down so its lowest rendered point meets the entity's feet.
+     * LivingEntityRenderer anchors the model origin 1.501 blocks above the feet;
+     * a model whose scaled reach (animScale * lowest geometry) falls short of that
+     * floats in mid-air.  Computed per-frame from the live pose so standing /
+     * dead / sitting poses all ground correctly.  Only ever pushes DOWN, so a
+     * model that already reaches the baseline is left untouched, and repeated
+     * calls within a frame are self-idempotent (the gap converges to ~0).
+     */
+    private void groundToBaseline()
+    {
+        if (inGuiPreview || this.modelRoot == null || this.animScaleY == 0F) return;
+
+        // lowest rendered point (down-positive): renderedY = animScale * (animRot * (v + animTrans)).y
+        final Quaternionf rot = this.animRot;
+        final float[] maxRotY = {Float.NEGATIVE_INFINITY};
+        final Vector3f tv = new Vector3f();
+        this.modelRoot.visit(new PoseStack(), (pose, path, index, cube) ->
+        {
+            for (int c = 0; c < 8; c++)
+            {
+                float cx = ((c & 1) == 0 ? cube.minX : cube.maxX) / 16F;
+                float cy = ((c & 2) == 0 ? cube.minY : cube.maxY) / 16F;
+                float cz = ((c & 4) == 0 ? cube.minZ : cube.maxZ) / 16F;
+                pose.pose().transformPosition(cx, cy, cz, tv);
+                tv.rotate(rot);
+                if (tv.y > maxRotY[0]) maxRotY[0] = tv.y;
+            }
+        });
+        if (maxRotY[0] == Float.NEGATIVE_INFINITY) return;
+
+        // rotate the accumulated translate into rendered space
+        float transDownY = new Vector3f(this.animTransX, this.animTransY, this.animTransZ)
+            .rotate(rot).y;
+        float gap = GROUND_BASE - this.animScaleY * (maxRotY[0] + transDownY);
+        if (gap <= 1.0E-4F) return;
+
+        // shift down by exactly the gap, expressed back in pre-rotation translate space
+        Vector3f d = new Vector3f(0F, gap / this.animScaleY, 0F)
+            .rotate(new Quaternionf(rot).conjugate());
+        this.animTransX += d.x;
+        this.animTransY += d.y;
+        this.animTransZ += d.z;
     }
 
     /** capture entity for use in renderToBuffer (which has no entity parm) */

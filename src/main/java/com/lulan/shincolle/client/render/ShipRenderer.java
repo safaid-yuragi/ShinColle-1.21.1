@@ -17,6 +17,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -55,8 +56,12 @@ public class ShipRenderer extends MobRenderer<Mob, EntityModel<Mob>>
     private EntityModel<Mob> modelFor(int shipClass)
     {
         return this.models.computeIfAbsent(shipClass, c ->
-            (EntityModel<Mob>) ShipRenderTable.ship(c).factory.apply(
-                this.ctx.getModelSet().bakeLayer(ShipRenderTable.ship(c).layer)));
+        {
+            ModelPart baked = this.ctx.getModelSet().bakeLayer(ShipRenderTable.ship(c).layer);
+            EntityModel<Mob> m = (EntityModel<Mob>) ShipRenderTable.ship(c).factory.apply(baked);
+            if (m instanceof ShipModel<?> sm) sm.modelRoot = baked;
+            return m;
+        });
     }
 
     /** ship class id for either ship hierarchy (friendly or hostile) */

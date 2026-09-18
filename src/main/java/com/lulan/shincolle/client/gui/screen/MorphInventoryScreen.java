@@ -1,5 +1,6 @@
 package com.lulan.shincolle.client.gui.screen;
 
+import com.lulan.shincolle.client.model.ShipModel;
 import com.lulan.shincolle.entity.BasicEntityShip;
 import com.lulan.shincolle.menu.MorphInventoryMenu;
 import com.lulan.shincolle.reference.Reference;
@@ -53,10 +54,15 @@ public class MorphInventoryScreen extends AbstractContainerScreen<MorphInventory
         //morph entity preview
         if (this.entity != null)
         {
-            InventoryScreen.renderEntityInInventoryFollowsMouse(g,
-                this.leftPos + 88, this.topPos + 120,
-                this.leftPos + 88, this.topPos + 120, 30, 0.0625F,
-                mouseX, mouseY, this.entity);
+            ShipModel.inGuiPreview = true;
+            try
+            {
+                InventoryScreen.renderEntityInInventoryFollowsMouse(g,
+                    this.leftPos + 88, this.topPos + 120,
+                    this.leftPos + 88, this.topPos + 120, 30, 0.0625F,
+                    mouseX, mouseY, this.entity);
+            }
+            finally { ShipModel.inGuiPreview = false; }
         }
     }
 

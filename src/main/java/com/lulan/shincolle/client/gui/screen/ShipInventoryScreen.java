@@ -1,5 +1,6 @@
 package com.lulan.shincolle.client.gui.screen;
 
+import com.lulan.shincolle.client.model.ShipModel;
 import com.lulan.shincolle.entity.BasicEntityShip;
 import com.lulan.shincolle.menu.ShipInventoryMenu;
 import com.lulan.shincolle.network.payload.GuiButtonPayload;
@@ -411,9 +412,14 @@ public class ShipInventoryScreen extends AbstractContainerScreen<ShipInventoryMe
 
         g.enableScissor(this.leftPos + 165, this.topPos + 18,
                         this.leftPos + 249, this.topPos + 118);
-        InventoryScreen.renderEntityInInventory(g,
-            this.leftPos + 218 + mp[0], this.topPos + 100 + mp[1],
-            scale, new Vector3f(0F, 0F, 0F), pose, cam, this.entity);
+        ShipModel.inGuiPreview = true;
+        try
+        {
+            InventoryScreen.renderEntityInInventory(g,
+                this.leftPos + 218 + mp[0], this.topPos + 100 + mp[1],
+                scale, new Vector3f(0F, 0F, 0F), pose, cam, this.entity);
+        }
+        finally { ShipModel.inGuiPreview = false; }
         g.disableScissor();
 
         this.entity.yBodyRot = bodyRot; this.entity.setYRot(yRot);
