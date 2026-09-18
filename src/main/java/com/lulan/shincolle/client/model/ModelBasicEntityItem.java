@@ -49,7 +49,7 @@ public class ModelBasicEntityItem<T extends Entity> extends ShipModel<T>
 		MeshDefinition meshdefinition = new MeshDefinition();
 		PartDefinition partdefinition = meshdefinition.getRoot();
 
-		PartDefinition partdef0 = partdefinition.addOrReplaceChild("shape1", CubeListBuilder.create().addBox(-8.0F, -8.0F, -8.0F, 16.0F, 16.0F, 16.0F), PartPose.offsetAndRotation(0.0F, 10.1F, 0.0F, 1.275F, 0.592F, 0.774F));
+		PartDefinition partdef0 = partdefinition.addOrReplaceChild("shape1", CubeListBuilder.create().texOffs(0, 0).addBox(-8.0F, -8.0F, -8.0F, 16.0F, 16.0F, 16.0F), PartPose.offsetAndRotation(0.0F, 10.1F, 0.0F, 1.275F, 0.592F, 0.774F));
 
 		return LayerDefinition.create(meshdefinition, 64, 32);
 	}

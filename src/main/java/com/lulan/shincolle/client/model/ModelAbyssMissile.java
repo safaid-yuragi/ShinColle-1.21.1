@@ -53,11 +53,11 @@ public class ModelAbyssMissile<T extends Entity> extends ShipModel<T>
 		MeshDefinition meshdefinition = new MeshDefinition();
 		PartDefinition partdefinition = meshdefinition.getRoot();
 
-		PartDefinition partdef0 = partdefinition.addOrReplaceChild("Body", CubeListBuilder.create().addBox(-2.0F, -2.0F, -5.5F, 4.0F, 4.0F, 11.0F), PartPose.offset(0.0F, 14.0F, -1.5F));
-		PartDefinition partdef1 = partdef0.addOrReplaceChild("Head", CubeListBuilder.create().addBox(0.0F, 0.0F, 0.0F, 3.0F, 3.0F, 1.0F), PartPose.offset(-1.5F, -1.5F, -6.5F));
-		PartDefinition partdef2 = partdef0.addOrReplaceChild("Tail", CubeListBuilder.create().addBox(0.0F, 0.0F, 0.0F, 2.0F, 2.0F, 3.0F), PartPose.offset(-1.0F, -1.0F, 5.5F));
-		PartDefinition partdef3 = partdef0.addOrReplaceChild("Tail1", CubeListBuilder.create().addBox(0.0F, 0.0F, 0.0F, 1.0F, 5.0F, 4.0F), PartPose.offset(-0.5F, -2.5F, 5.5F));
-		PartDefinition partdef4 = partdef0.addOrReplaceChild("Tail2", CubeListBuilder.create().addBox(0.0F, 0.0F, 0.0F, 5.0F, 1.0F, 4.0F), PartPose.offset(-2.5F, -0.5F, 5.5F));
+		PartDefinition partdef0 = partdefinition.addOrReplaceChild("Body", CubeListBuilder.create().texOffs(0, 0).addBox(-2.0F, -2.0F, -5.5F, 4.0F, 4.0F, 11.0F), PartPose.offset(0.0F, 14.0F, -1.5F));
+		PartDefinition partdef1 = partdef0.addOrReplaceChild("Head", CubeListBuilder.create().texOffs(0, 0).addBox(0.0F, 0.0F, 0.0F, 3.0F, 3.0F, 1.0F), PartPose.offset(-1.5F, -1.5F, -6.5F));
+		PartDefinition partdef2 = partdef0.addOrReplaceChild("Tail", CubeListBuilder.create().texOffs(0, 4).addBox(0.0F, 0.0F, 0.0F, 2.0F, 2.0F, 3.0F), PartPose.offset(-1.0F, -1.0F, 5.5F));
+		PartDefinition partdef3 = partdef0.addOrReplaceChild("Tail1", CubeListBuilder.create().texOffs(0, 20).addBox(0.0F, 0.0F, 0.0F, 1.0F, 5.0F, 4.0F), PartPose.offset(-0.5F, -2.5F, 5.5F));
+		PartDefinition partdef4 = partdef0.addOrReplaceChild("Tail2", CubeListBuilder.create().texOffs(0, 15).addBox(0.0F, 0.0F, 0.0F, 5.0F, 1.0F, 4.0F), PartPose.offset(-2.5F, -0.5F, 5.5F));
 
 		return LayerDefinition.create(meshdefinition, 32, 32);
 	}

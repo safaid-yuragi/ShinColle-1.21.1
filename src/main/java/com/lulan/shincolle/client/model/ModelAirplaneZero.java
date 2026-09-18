@@ -62,19 +62,19 @@ public class ModelAirplaneZero<T extends Entity> extends ShipModel<T>
 		MeshDefinition meshdefinition = new MeshDefinition();
 		PartDefinition partdefinition = meshdefinition.getRoot();
 
-		PartDefinition partdef0 = partdefinition.addOrReplaceChild("BodyMain", CubeListBuilder.create().addBox(-2.0F, -3.0F, -6.0F, 4.0F, 4.0F, 11.0F), PartPose.offset(0.0F, 0.0F, 0.0F));
-		PartDefinition partdef1 = partdef0.addOrReplaceChild("Propeller", CubeListBuilder.create().addBox(-3.0F, -3.0F, 0.0F, 6.0F, 6.0F, 0.0F), PartPose.offset(0.0F, -1.0F, -6.5F));
-		PartDefinition partdef2 = partdef0.addOrReplaceChild("Wing02", CubeListBuilder.create().addBox(-13.0F, 0.0F, 0.0F, 13.0F, 1.0F, 5.0F), PartPose.offsetAndRotation(-2.0F, -0.4F, -3.2F, 0.0F, 0.0F, 0.06981317007977318F));
-		PartDefinition partdef3 = partdef0.addOrReplaceChild("Prop02", CubeListBuilder.create().addBox(-1.0F, -1.0F, 0.0F, 2.0F, 2.0F, 2.0F), PartPose.offset(0.0F, -1.0F, -7.5F));
-		PartDefinition partdef4 = partdef0.addOrReplaceChild("Tail01", CubeListBuilder.create().addBox(-2.0F, 0.0F, 0.0F, 4.0F, 3.0F, 4.0F), PartPose.offset(0.0F, -2.8F, 5.0F));
-		PartDefinition partdef5 = partdef4.addOrReplaceChild("Tail02", CubeListBuilder.create().addBox(-1.5F, 0.0F, 0.0F, 3.0F, 2.0F, 6.0F), PartPose.offset(0.0F, 0.1F, 4.0F));
-		PartDefinition partdef6 = partdef5.addOrReplaceChild("Tail03", CubeListBuilder.create().addBox(-0.5F, 0.0F, 0.0F, 1.0F, 4.0F, 3.0F), PartPose.offsetAndRotation(0.0F, -2.2F, 4.5F, -1.0471975511965976F, 0.0F, 0.0F));
-		PartDefinition partdef7 = partdef5.addOrReplaceChild("Tail04", CubeListBuilder.create().addBox(-6.5F, 0.0F, 0.0F, 13.0F, 1.0F, 3.0F), PartPose.offset(0.0F, 0.2F, 2.0F));
-		PartDefinition partdef8 = partdef0.addOrReplaceChild("Wing01", CubeListBuilder.create().mirror().addBox(0.0F, 0.0F, 0.0F, 13.0F, 1.0F, 5.0F), PartPose.offsetAndRotation(2.0F, -0.4F, -3.2F, 0.0F, 0.0F, -0.06981317007977318F));
-		PartDefinition partdef9 = partdef0.addOrReplaceChild("BodyU", CubeListBuilder.create().addBox(-1.5F, 0.0F, 0.0F, 3.0F, 2.0F, 6.0F), PartPose.offsetAndRotation(0.0F, -4.9F, -1.8F, -0.3141592653589793F, 0.0F, 0.0F));
-		PartDefinition partdef10 = partdef0.addOrReplaceChild("Tank", CubeListBuilder.create().addBox(-1.0F, 0.0F, 0.0F, 2.0F, 2.0F, 4.0F), PartPose.offset(0.0F, 0.5F, -3.0F));
-		PartDefinition partdef11 = partdefinition.addOrReplaceChild("GlowBodyMain", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
-		PartDefinition partdef12 = partdef11.addOrReplaceChild("BodyU", CubeListBuilder.create().addBox(-1.5F, 0.0F, 0.0F, 3.0F, 2.0F, 6.0F), PartPose.offsetAndRotation(0.0F, -4.9F, -1.8F, -0.3141592653589793F, 0.0F, 0.0F));
+		PartDefinition partdef0 = partdefinition.addOrReplaceChild("BodyMain", CubeListBuilder.create().texOffs(0, 17).addBox(-2.0F, -3.0F, -6.0F, 4.0F, 4.0F, 11.0F), PartPose.offset(0.0F, 0.0F, 0.0F));
+		PartDefinition partdef1 = partdef0.addOrReplaceChild("Propeller", CubeListBuilder.create().texOffs(0, 6).addBox(-3.0F, -3.0F, 0.0F, 6.0F, 6.0F, 0.0F), PartPose.offset(0.0F, -1.0F, -6.5F));
+		PartDefinition partdef2 = partdef0.addOrReplaceChild("Wing02", CubeListBuilder.create().texOffs(0, 0).addBox(-13.0F, 0.0F, 0.0F, 13.0F, 1.0F, 5.0F), PartPose.offsetAndRotation(-2.0F, -0.4F, -3.2F, 0.0F, 0.0F, 0.06981317007977318F));
+		PartDefinition partdef3 = partdef0.addOrReplaceChild("Prop02", CubeListBuilder.create().texOffs(0, 24).addBox(-1.0F, -1.0F, 0.0F, 2.0F, 2.0F, 2.0F), PartPose.offset(0.0F, -1.0F, -7.5F));
+		PartDefinition partdef4 = partdef0.addOrReplaceChild("Tail01", CubeListBuilder.create().texOffs(30, 25).addBox(-2.0F, 0.0F, 0.0F, 4.0F, 3.0F, 4.0F), PartPose.offset(0.0F, -2.8F, 5.0F));
+		PartDefinition partdef5 = partdef4.addOrReplaceChild("Tail02", CubeListBuilder.create().texOffs(46, 24).addBox(-1.5F, 0.0F, 0.0F, 3.0F, 2.0F, 6.0F), PartPose.offset(0.0F, 0.1F, 4.0F));
+		PartDefinition partdef6 = partdef5.addOrReplaceChild("Tail03", CubeListBuilder.create().texOffs(0, 17).addBox(-0.5F, 0.0F, 0.0F, 1.0F, 4.0F, 3.0F), PartPose.offsetAndRotation(0.0F, -2.2F, 4.5F, -1.0471975511965976F, 0.0F, 0.0F));
+		PartDefinition partdef7 = partdef5.addOrReplaceChild("Tail04", CubeListBuilder.create().texOffs(0, 13).addBox(-6.5F, 0.0F, 0.0F, 13.0F, 1.0F, 3.0F), PartPose.offset(0.0F, 0.2F, 2.0F));
+		PartDefinition partdef8 = partdef0.addOrReplaceChild("Wing01", CubeListBuilder.create().texOffs(0, 0).mirror().addBox(0.0F, 0.0F, 0.0F, 13.0F, 1.0F, 5.0F), PartPose.offsetAndRotation(2.0F, -0.4F, -3.2F, 0.0F, 0.0F, -0.06981317007977318F));
+		PartDefinition partdef9 = partdef0.addOrReplaceChild("BodyU", CubeListBuilder.create().texOffs(19, 17).addBox(-1.5F, 0.0F, 0.0F, 3.0F, 2.0F, 6.0F), PartPose.offsetAndRotation(0.0F, -4.9F, -1.8F, -0.3141592653589793F, 0.0F, 0.0F));
+		PartDefinition partdef10 = partdef0.addOrReplaceChild("Tank", CubeListBuilder.create().texOffs(14, 7).addBox(-1.0F, 0.0F, 0.0F, 2.0F, 2.0F, 4.0F), PartPose.offset(0.0F, 0.5F, -3.0F));
+		PartDefinition partdef11 = partdefinition.addOrReplaceChild("GlowBodyMain", CubeListBuilder.create().texOffs(0, 17), PartPose.offset(0.0F, 0.0F, 0.0F));
+		PartDefinition partdef12 = partdef11.addOrReplaceChild("BodyU", CubeListBuilder.create().texOffs(19, 17).addBox(-1.5F, 0.0F, 0.0F, 3.0F, 2.0F, 6.0F), PartPose.offsetAndRotation(0.0F, -4.9F, -1.8F, -0.3141592653589793F, 0.0F, 0.0F));
 
 		return LayerDefinition.create(meshdefinition, 64, 32);
 	}

@@ -53,11 +53,11 @@ public class ModelBlockDesk<T extends Entity> extends ShipModel<T>
 		MeshDefinition meshdefinition = new MeshDefinition();
 		PartDefinition partdefinition = meshdefinition.getRoot();
 
-		PartDefinition partdef0 = partdefinition.addOrReplaceChild("shape3", CubeListBuilder.create().addBox(0.0F, 0.0F, 0.0F, 1.0F, 15.0F, 15.0F), PartPose.offset(-8.0F, 9.0F, -8.0F));
-		PartDefinition partdef1 = partdefinition.addOrReplaceChild("shape6", CubeListBuilder.create().addBox(0.0F, 0.0F, 0.0F, 16.0F, 1.0F, 16.0F), PartPose.offset(-8.0F, 8.0F, -8.0F));
-		PartDefinition partdef2 = partdefinition.addOrReplaceChild("shape1", CubeListBuilder.create().addBox(0.0F, 0.0F, 0.0F, 14.0F, 6.0F, 1.0F), PartPose.offset(-7.0F, 9.0F, -8.0F));
-		PartDefinition partdef3 = partdefinition.addOrReplaceChild("shape2", CubeListBuilder.create().addBox(0.0F, 0.0F, 0.0F, 16.0F, 15.0F, 1.0F), PartPose.offset(-8.0F, 9.0F, 7.0F));
-		PartDefinition partdef4 = partdefinition.addOrReplaceChild("shape4", CubeListBuilder.create().addBox(0.0F, 0.0F, 0.0F, 1.0F, 15.0F, 15.0F), PartPose.offset(7.0F, 9.0F, -8.0F));
+		PartDefinition partdef0 = partdefinition.addOrReplaceChild("shape3", CubeListBuilder.create().texOffs(0, 0).addBox(0.0F, 0.0F, 0.0F, 1.0F, 15.0F, 15.0F), PartPose.offset(-8.0F, 9.0F, -8.0F));
+		PartDefinition partdef1 = partdefinition.addOrReplaceChild("shape6", CubeListBuilder.create().texOffs(0, 30).addBox(0.0F, 0.0F, 0.0F, 16.0F, 1.0F, 16.0F), PartPose.offset(-8.0F, 8.0F, -8.0F));
+		PartDefinition partdef2 = partdefinition.addOrReplaceChild("shape1", CubeListBuilder.create().texOffs(34, 0).addBox(0.0F, 0.0F, 0.0F, 14.0F, 6.0F, 1.0F), PartPose.offset(-7.0F, 9.0F, -8.0F));
+		PartDefinition partdef3 = partdefinition.addOrReplaceChild("shape2", CubeListBuilder.create().texOffs(0, 0).addBox(0.0F, 0.0F, 0.0F, 16.0F, 15.0F, 1.0F), PartPose.offset(-8.0F, 9.0F, 7.0F));
+		PartDefinition partdef4 = partdefinition.addOrReplaceChild("shape4", CubeListBuilder.create().texOffs(0, 0).addBox(0.0F, 0.0F, 0.0F, 1.0F, 15.0F, 15.0F), PartPose.offset(7.0F, 9.0F, -8.0F));
 
 		return LayerDefinition.create(meshdefinition, 64, 64);
 	}

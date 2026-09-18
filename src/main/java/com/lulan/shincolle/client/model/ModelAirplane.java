@@ -62,20 +62,20 @@ public class ModelAirplane<T extends Entity> extends ShipModel<T>
 		MeshDefinition meshdefinition = new MeshDefinition();
 		PartDefinition partdefinition = meshdefinition.getRoot();
 
-		PartDefinition partdef0 = partdefinition.addOrReplaceChild("BodyMain", CubeListBuilder.create().addBox(-3.0F, -3.0F, -1.0F, 6.0F, 7.0F, 7.0F), PartPose.offset(0.0F, 0.0F, 0.0F));
-		PartDefinition partdef1 = partdef0.addOrReplaceChild("Head", CubeListBuilder.create().addBox(-2.0F, -2.0F, -2.0F, 4.0F, 4.0F, 4.0F), PartPose.offsetAndRotation(0.0F, 0.0F, -6.2F, 0.0F, 0.7853981633974483F, 0.0F));
-		PartDefinition partdef2 = partdef0.addOrReplaceChild("BombR", CubeListBuilder.create().addBox(0.0F, 0.0F, 0.0F, 2.0F, 2.0F, 6.0F), PartPose.offsetAndRotation(-6.0F, 2.3F, -1.0F, 0.0F, 0.0F, 0.7853981633974483F));
-		PartDefinition partdef3 = partdef0.addOrReplaceChild("AirfoilL", CubeListBuilder.create().addBox(-2.5F, -2.0F, -6.0F, 5.0F, 4.0F, 11.0F), PartPose.offsetAndRotation(3.5F, 0.0F, 0.0F, 0.0F, 0.5235987755982988F, 0.12217304763960307F));
-		PartDefinition partdef4 = partdef0.addOrReplaceChild("AirfoilR", CubeListBuilder.create().addBox(-2.5F, -2.0F, -6.0F, 5.0F, 4.0F, 11.0F), PartPose.offsetAndRotation(-3.5F, 0.0F, 0.0F, 0.0F, -0.5235987755982988F, -0.12217304763960307F));
-		PartDefinition partdef5 = partdef0.addOrReplaceChild("BombL", CubeListBuilder.create().addBox(0.0F, 0.0F, 0.0F, 2.0F, 2.0F, 6.0F), PartPose.offsetAndRotation(6.0F, 2.3F, -1.0F, 0.0F, 0.0F, 0.7853981633974483F));
-		PartDefinition partdef6 = partdef0.addOrReplaceChild("GunBase", CubeListBuilder.create().addBox(-1.5F, 0.0F, 0.0F, 3.0F, 4.0F, 3.0F), PartPose.offset(0.0F, 4.0F, 2.5F));
-		PartDefinition partdef7 = partdef6.addOrReplaceChild("Gun", CubeListBuilder.create().addBox(-0.5F, 0.0F, -8.0F, 1.0F, 1.0F, 8.0F), PartPose.offsetAndRotation(0.0F, 2.5F, 0.0F, 0.05235987755982988F, 0.0F, 0.0F));
-		PartDefinition partdef8 = partdef0.addOrReplaceChild("Tail", CubeListBuilder.create().addBox(-4.0F, -2.5F, -4.0F, 8.0F, 5.0F, 8.0F), PartPose.offsetAndRotation(0.0F, 0.0F, 4.3F, 0.0F, 0.7853981633974483F, 0.0F));
-		PartDefinition partdef9 = partdef0.addOrReplaceChild("BodyFront", CubeListBuilder.create().addBox(-2.5F, -2.6F, -2.5F, 5.0F, 6.0F, 5.0F), PartPose.offsetAndRotation(0.0F, 0.0F, -3.2F, 0.08726646259971647F, 0.0F, 0.0F));
-		PartDefinition partdef10 = partdef0.addOrReplaceChild("Tongue", CubeListBuilder.create().addBox(-1.5F, 0.0F, -3.0F, 3.0F, 1.0F, 3.0F), PartPose.offsetAndRotation(0.0F, 2.3F, -3.5F, 1.6580627893946132F, 0.0F, 0.0F));
-		PartDefinition partdef11 = partdefinition.addOrReplaceChild("GlowBodyMain", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
-		PartDefinition partdef12 = partdef11.addOrReplaceChild("EyeL", CubeListBuilder.create().addBox(-2.0F, 0.0F, -2.0F, 4.0F, 2.0F, 4.0F), PartPose.offsetAndRotation(3.7F, -3.2F, 2.0F, 0.0F, 0.7853981633974483F, 0.17453292519943295F));
-		PartDefinition partdef13 = partdef11.addOrReplaceChild("EyeR", CubeListBuilder.create().addBox(-2.0F, 0.0F, -2.0F, 4.0F, 2.0F, 4.0F), PartPose.offsetAndRotation(-3.7F, -3.2F, 2.0F, 0.0F, -2.356194490192345F, -0.17453292519943295F));
+		PartDefinition partdef0 = partdefinition.addOrReplaceChild("BodyMain", CubeListBuilder.create().texOffs(3, 18).addBox(-3.0F, -3.0F, -1.0F, 6.0F, 7.0F, 7.0F), PartPose.offset(0.0F, 0.0F, 0.0F));
+		PartDefinition partdef1 = partdef0.addOrReplaceChild("Head", CubeListBuilder.create().texOffs(8, 24).addBox(-2.0F, -2.0F, -2.0F, 4.0F, 4.0F, 4.0F), PartPose.offsetAndRotation(0.0F, 0.0F, -6.2F, 0.0F, 0.7853981633974483F, 0.0F));
+		PartDefinition partdef2 = partdef0.addOrReplaceChild("BombR", CubeListBuilder.create().texOffs(0, 0).addBox(0.0F, 0.0F, 0.0F, 2.0F, 2.0F, 6.0F), PartPose.offsetAndRotation(-6.0F, 2.3F, -1.0F, 0.0F, 0.0F, 0.7853981633974483F));
+		PartDefinition partdef3 = partdef0.addOrReplaceChild("AirfoilL", CubeListBuilder.create().texOffs(0, 17).addBox(-2.5F, -2.0F, -6.0F, 5.0F, 4.0F, 11.0F), PartPose.offsetAndRotation(3.5F, 0.0F, 0.0F, 0.0F, 0.5235987755982988F, 0.12217304763960307F));
+		PartDefinition partdef4 = partdef0.addOrReplaceChild("AirfoilR", CubeListBuilder.create().texOffs(0, 17).addBox(-2.5F, -2.0F, -6.0F, 5.0F, 4.0F, 11.0F), PartPose.offsetAndRotation(-3.5F, 0.0F, 0.0F, 0.0F, -0.5235987755982988F, -0.12217304763960307F));
+		PartDefinition partdef5 = partdef0.addOrReplaceChild("BombL", CubeListBuilder.create().texOffs(0, 0).addBox(0.0F, 0.0F, 0.0F, 2.0F, 2.0F, 6.0F), PartPose.offsetAndRotation(6.0F, 2.3F, -1.0F, 0.0F, 0.0F, 0.7853981633974483F));
+		PartDefinition partdef6 = partdef0.addOrReplaceChild("GunBase", CubeListBuilder.create().texOffs(10, 24).addBox(-1.5F, 0.0F, 0.0F, 3.0F, 4.0F, 3.0F), PartPose.offset(0.0F, 4.0F, 2.5F));
+		PartDefinition partdef7 = partdef6.addOrReplaceChild("Gun", CubeListBuilder.create().texOffs(0, 0).addBox(-0.5F, 0.0F, -8.0F, 1.0F, 1.0F, 8.0F), PartPose.offsetAndRotation(0.0F, 2.5F, 0.0F, 0.05235987755982988F, 0.0F, 0.0F));
+		PartDefinition partdef8 = partdef0.addOrReplaceChild("Tail", CubeListBuilder.create().texOffs(0, 19).addBox(-4.0F, -2.5F, -4.0F, 8.0F, 5.0F, 8.0F), PartPose.offsetAndRotation(0.0F, 0.0F, 4.3F, 0.0F, 0.7853981633974483F, 0.0F));
+		PartDefinition partdef9 = partdef0.addOrReplaceChild("BodyFront", CubeListBuilder.create().texOffs(12, 6).addBox(-2.5F, -2.6F, -2.5F, 5.0F, 6.0F, 5.0F), PartPose.offsetAndRotation(0.0F, 0.0F, -3.2F, 0.08726646259971647F, 0.0F, 0.0F));
+		PartDefinition partdef10 = partdef0.addOrReplaceChild("Tongue", CubeListBuilder.create().texOffs(0, 13).addBox(-1.5F, 0.0F, -3.0F, 3.0F, 1.0F, 3.0F), PartPose.offsetAndRotation(0.0F, 2.3F, -3.5F, 1.6580627893946132F, 0.0F, 0.0F));
+		PartDefinition partdef11 = partdefinition.addOrReplaceChild("GlowBodyMain", CubeListBuilder.create().texOffs(0, 0), PartPose.offset(0.0F, 0.0F, 0.0F));
+		PartDefinition partdef12 = partdef11.addOrReplaceChild("EyeL", CubeListBuilder.create().texOffs(16, 0).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 2.0F, 4.0F), PartPose.offsetAndRotation(3.7F, -3.2F, 2.0F, 0.0F, 0.7853981633974483F, 0.17453292519943295F));
+		PartDefinition partdef13 = partdef11.addOrReplaceChild("EyeR", CubeListBuilder.create().texOffs(16, 0).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 2.0F, 4.0F), PartPose.offsetAndRotation(-3.7F, -3.2F, 2.0F, 0.0F, -2.356194490192345F, -0.17453292519943295F));
 
 		return LayerDefinition.create(meshdefinition, 32, 32);
 	}

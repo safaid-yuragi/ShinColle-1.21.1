@@ -61,19 +61,19 @@ public class ModelTakoyaki<T extends Entity> extends ShipModel<T>
 		MeshDefinition meshdefinition = new MeshDefinition();
 		PartDefinition partdefinition = meshdefinition.getRoot();
 
-		PartDefinition partdef0 = partdefinition.addOrReplaceChild("BodyMain", CubeListBuilder.create().addBox(-6.5F, -6.4F, -6.5F, 13.0F, 9.0F, 13.0F), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, -0.3490658503988659F, 0.0F, 0.0F));
-		PartDefinition partdef1 = partdef0.addOrReplaceChild("Body1", CubeListBuilder.create().addBox(-5.0F, -4.3F, -8.0F, 10.0F, 7.0F, 16.0F), PartPose.offset(0.0F, 0.0F, 0.0F));
-		PartDefinition partdef2 = partdef0.addOrReplaceChild("JawMain", CubeListBuilder.create().addBox(-6.5F, -1.1F, -8.0F, 13.0F, 6.0F, 13.0F), PartPose.offsetAndRotation(0.0F, 3.5F, 3F, 1.3F, 0.0F, 0.0F));
-		PartDefinition partdef3 = partdef2.addOrReplaceChild("Jaw1", CubeListBuilder.create().addBox(-5.0F, 0.0F, 0.0F, 10.0F, 5.0F, 16.0F), PartPose.offset(0.0F, -1.2F, -9.5F));
-		PartDefinition partdef4 = partdef2.addOrReplaceChild("Jaw2", CubeListBuilder.create().addBox(-8.0F, 0.0F, 0.0F, 16.0F, 5.0F, 10.0F), PartPose.offset(0.0F, -1.0F, -6.5F));
-		PartDefinition partdef5 = partdef2.addOrReplaceChild("Jaw3", CubeListBuilder.create().addBox(-5.0F, 5.0F, -5.5F, 10.0F, 2.0F, 9.0F), PartPose.offset(0.0F, 0.0F, 0.0F));
-		PartDefinition partdef6 = partdef2.addOrReplaceChild("Tongue", CubeListBuilder.create().addBox(-4.5F, 0.0F, -7.0F, 9.0F, 3.0F, 7.0F), PartPose.offsetAndRotation(0.0F, -2.0F, 0.5F, -0.08726646259971647F, 0.0F, 0.0F));
-		PartDefinition partdef7 = partdef0.addOrReplaceChild("Body3", CubeListBuilder.create().addBox(-8.0F, -5.0F, -5.0F, 16.0F, 8.0F, 10.0F), PartPose.offset(0.0F, -0.5F, 0.0F));
-		PartDefinition partdef8 = partdef0.addOrReplaceChild("Body2", CubeListBuilder.create().addBox(-5.0F, -8.5F, -4.5F, 10.0F, 2.0F, 9.0F), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, -0.01361356816555577F));
-		PartDefinition partdef9 = partdef0.addOrReplaceChild("EarL", CubeListBuilder.create().mirror().addBox(-2.0F, -8.0F, -1.5F, 4.0F, 8.0F, 3.0F), PartPose.offsetAndRotation(5.5F, -4.5F, 3.0F, -0.5235987755982988F, -0.5235987755982988F, 0.7853981633974483F));
-		PartDefinition partdef10 = partdef0.addOrReplaceChild("EarR", CubeListBuilder.create().addBox(-2.0F, -8.0F, -1.5F, 4.0F, 8.0F, 3.0F), PartPose.offsetAndRotation(-5.5F, -4.5F, 3.0F, -0.5235987755982988F, 0.5235987755982988F, -0.7853981633974483F));
-		PartDefinition partdef11 = partdefinition.addOrReplaceChild("GlowBodyMain", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
-		PartDefinition partdef12 = partdef11.addOrReplaceChild("EyeL", CubeListBuilder.create().addBox(0.0F, -3.0F, -3.0F, 0.0F, 5.0F, 5.0F), PartPose.offsetAndRotation(8.1F, -3.3F, 0.5F, -0.17453292519943295F, 0.0F, 0.0F));
+		PartDefinition partdef0 = partdefinition.addOrReplaceChild("BodyMain", CubeListBuilder.create().texOffs(76, 42).addBox(-6.5F, -6.4F, -6.5F, 13.0F, 9.0F, 13.0F), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, -0.3490658503988659F, 0.0F, 0.0F));
+		PartDefinition partdef1 = partdef0.addOrReplaceChild("Body1", CubeListBuilder.create().texOffs(76, 19).addBox(-5.0F, -4.3F, -8.0F, 10.0F, 7.0F, 16.0F), PartPose.offset(0.0F, 0.0F, 0.0F));
+		PartDefinition partdef2 = partdef0.addOrReplaceChild("JawMain", CubeListBuilder.create().texOffs(0, 38).addBox(-6.5F, -1.1F, -8.0F, 13.0F, 6.0F, 13.0F), PartPose.offsetAndRotation(0.0F, 3.5F, 3F, 1.3F, 0.0F, 0.0F));
+		PartDefinition partdef3 = partdef2.addOrReplaceChild("Jaw1", CubeListBuilder.create().texOffs(0, 17).addBox(-5.0F, 0.0F, 0.0F, 10.0F, 5.0F, 16.0F), PartPose.offset(0.0F, -1.2F, -9.5F));
+		PartDefinition partdef4 = partdef2.addOrReplaceChild("Jaw2", CubeListBuilder.create().texOffs(0, 2).addBox(-8.0F, 0.0F, 0.0F, 16.0F, 5.0F, 10.0F), PartPose.offset(0.0F, -1.0F, -6.5F));
+		PartDefinition partdef5 = partdef2.addOrReplaceChild("Jaw3", CubeListBuilder.create().texOffs(42, 0).addBox(-5.0F, 5.0F, -5.5F, 10.0F, 2.0F, 9.0F), PartPose.offset(0.0F, 0.0F, 0.0F));
+		PartDefinition partdef6 = partdef2.addOrReplaceChild("Tongue", CubeListBuilder.create().texOffs(50, 39).addBox(-4.5F, 0.0F, -7.0F, 9.0F, 3.0F, 7.0F), PartPose.offsetAndRotation(0.0F, -2.0F, 0.5F, -0.08726646259971647F, 0.0F, 0.0F));
+		PartDefinition partdef7 = partdef0.addOrReplaceChild("Body3", CubeListBuilder.create().texOffs(76, 1).addBox(-8.0F, -5.0F, -5.0F, 16.0F, 8.0F, 10.0F), PartPose.offset(0.0F, -0.5F, 0.0F));
+		PartDefinition partdef8 = partdef0.addOrReplaceChild("Body2", CubeListBuilder.create().texOffs(54, 19).addBox(-5.0F, -8.5F, -4.5F, 10.0F, 2.0F, 9.0F), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, -0.01361356816555577F));
+		PartDefinition partdef9 = partdef0.addOrReplaceChild("EarL", CubeListBuilder.create().texOffs(114, 20).mirror().addBox(-2.0F, -8.0F, -1.5F, 4.0F, 8.0F, 3.0F), PartPose.offsetAndRotation(5.5F, -4.5F, 3.0F, -0.5235987755982988F, -0.5235987755982988F, 0.7853981633974483F));
+		PartDefinition partdef10 = partdef0.addOrReplaceChild("EarR", CubeListBuilder.create().texOffs(114, 20).addBox(-2.0F, -8.0F, -1.5F, 4.0F, 8.0F, 3.0F), PartPose.offsetAndRotation(-5.5F, -4.5F, 3.0F, -0.5235987755982988F, 0.5235987755982988F, -0.7853981633974483F));
+		PartDefinition partdef11 = partdefinition.addOrReplaceChild("GlowBodyMain", CubeListBuilder.create().texOffs(0, 0), PartPose.offset(0.0F, 0.0F, 0.0F));
+		PartDefinition partdef12 = partdef11.addOrReplaceChild("EyeL", CubeListBuilder.create().texOffs(65, 50).addBox(0.0F, -3.0F, -3.0F, 0.0F, 5.0F, 5.0F), PartPose.offsetAndRotation(8.1F, -3.3F, 0.5F, -0.17453292519943295F, 0.0F, 0.0F));
 
 		return LayerDefinition.create(meshdefinition, 128, 64);
 	}

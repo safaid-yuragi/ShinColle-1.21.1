@@ -38,16 +38,16 @@ abstract public class ShipModelBaseAdv<T extends Entity> extends ShipModel<T> im
      */
     public static void addDefaultFaceParts(PartDefinition head)
     {
-        head.addOrReplaceChild("Face0", CubeListBuilder.create().texOffs(98, 63).addBox(-7.0F, 0.0F, -0.5F, 14, 12, 1), PartPose.offset(0.0F, -12.2F, -6.1F));
-        head.addOrReplaceChild("Face1", CubeListBuilder.create().texOffs(98, 76).addBox(-7.0F, 0.0F, -0.5F, 14, 12, 1), PartPose.offset(0.0F, -12.2F, -6.1F));
-        head.addOrReplaceChild("Face2", CubeListBuilder.create().texOffs(98, 89).addBox(-7.0F, 0.0F, -0.5F, 14, 12, 1), PartPose.offset(0.0F, -12.2F, -6.1F));
-        head.addOrReplaceChild("Face3", CubeListBuilder.create().texOffs(98, 102).addBox(-7.0F, 0.0F, -0.5F, 14, 12, 1), PartPose.offset(0.0F, -12.2F, -6.1F));
-        head.addOrReplaceChild("Face4", CubeListBuilder.create().texOffs(98, 115).addBox(-7.0F, 0.0F, -0.5F, 14, 12, 1), PartPose.offset(0.0F, -12.2F, -6.1F));
-        head.addOrReplaceChild("Mouth0", CubeListBuilder.create().texOffs(100, 53).addBox(-3.0F, 0.0F, -0.5F, 6, 4, 1), PartPose.offset(0.0F, -4.2F, -6.2F));
-        head.addOrReplaceChild("Mouth1", CubeListBuilder.create().texOffs(100, 58).addBox(-3.0F, 0.0F, -0.5F, 6, 4, 1), PartPose.offset(0.0F, -4.2F, -6.2F));
-        head.addOrReplaceChild("Mouth2", CubeListBuilder.create().texOffs(114, 53).addBox(-3.0F, 0.0F, -0.5F, 6, 4, 1), PartPose.offset(0.0F, -4.2F, -6.2F));
-        head.addOrReplaceChild("Flush0", CubeListBuilder.create().texOffs(114, 58).addBox(-1.0F, 0.0F, -0.5F, 2, 1, 0), PartPose.offset(-6.0F, -3.0F, -6.9F));
-        head.addOrReplaceChild("Flush1", CubeListBuilder.create().texOffs(114, 58).addBox(-1.0F, 0.0F, -0.5F, 2, 1, 0), PartPose.offset(6.0F, -3.0F, -6.9F));
+        head.addOrReplaceChild("Face0", CubeListBuilder.create().texOffs(98, 63).texOffs(98, 63).addBox(-7.0F, 0.0F, -0.5F, 14, 12, 1), PartPose.offset(0.0F, -12.2F, -6.1F));
+        head.addOrReplaceChild("Face1", CubeListBuilder.create().texOffs(98, 76).texOffs(98, 76).addBox(-7.0F, 0.0F, -0.5F, 14, 12, 1), PartPose.offset(0.0F, -12.2F, -6.1F));
+        head.addOrReplaceChild("Face2", CubeListBuilder.create().texOffs(98, 89).texOffs(98, 89).addBox(-7.0F, 0.0F, -0.5F, 14, 12, 1), PartPose.offset(0.0F, -12.2F, -6.1F));
+        head.addOrReplaceChild("Face3", CubeListBuilder.create().texOffs(98, 102).texOffs(98, 102).addBox(-7.0F, 0.0F, -0.5F, 14, 12, 1), PartPose.offset(0.0F, -12.2F, -6.1F));
+        head.addOrReplaceChild("Face4", CubeListBuilder.create().texOffs(98, 115).texOffs(98, 115).addBox(-7.0F, 0.0F, -0.5F, 14, 12, 1), PartPose.offset(0.0F, -12.2F, -6.1F));
+        head.addOrReplaceChild("Mouth0", CubeListBuilder.create().texOffs(100, 53).texOffs(100, 53).addBox(-3.0F, 0.0F, -0.5F, 6, 4, 1), PartPose.offset(0.0F, -4.2F, -6.2F));
+        head.addOrReplaceChild("Mouth1", CubeListBuilder.create().texOffs(100, 58).texOffs(100, 58).addBox(-3.0F, 0.0F, -0.5F, 6, 4, 1), PartPose.offset(0.0F, -4.2F, -6.2F));
+        head.addOrReplaceChild("Mouth2", CubeListBuilder.create().texOffs(114, 53).texOffs(114, 53).addBox(-3.0F, 0.0F, -0.5F, 6, 4, 1), PartPose.offset(0.0F, -4.2F, -6.2F));
+        head.addOrReplaceChild("Flush0", CubeListBuilder.create().texOffs(114, 58).texOffs(114, 58).addBox(-1.0F, 0.0F, -0.5F, 2, 1, 0), PartPose.offset(-6.0F, -3.0F, -6.9F));
+        head.addOrReplaceChild("Flush1", CubeListBuilder.create().texOffs(114, 58).texOffs(114, 58).addBox(-1.0F, 0.0F, -0.5F, 2, 1, 0), PartPose.offset(6.0F, -3.0F, -6.9F));
     }
 
     /** bake face fields from the head part that owns them */

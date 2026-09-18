@@ -49,7 +49,7 @@ public class ModelVortex<T extends Entity> extends ShipModel<T>
 		MeshDefinition meshdefinition = new MeshDefinition();
 		PartDefinition partdefinition = meshdefinition.getRoot();
 
-		PartDefinition partdef0 = partdefinition.addOrReplaceChild("Vortex", CubeListBuilder.create().addBox(-64.0F, -64.0F, 0.0F, 128.0F, 128.0F, 0.0F), PartPose.offset(0.0F, 0.0F, 0.0F));
+		PartDefinition partdef0 = partdefinition.addOrReplaceChild("Vortex", CubeListBuilder.create().texOffs(0, 0).addBox(-64.0F, -64.0F, 0.0F, 128.0F, 128.0F, 0.0F), PartPose.offset(0.0F, 0.0F, 0.0F));
 
 		return LayerDefinition.create(meshdefinition, 256, 128);
 	}

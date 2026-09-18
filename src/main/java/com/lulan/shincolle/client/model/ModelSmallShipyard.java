@@ -60,17 +60,17 @@ public class ModelSmallShipyard<T extends Entity> extends ShipModel<T>
 		MeshDefinition meshdefinition = new MeshDefinition();
 		PartDefinition partdefinition = meshdefinition.getRoot();
 
-		PartDefinition partdef0 = partdefinition.addOrReplaceChild("Shape1", CubeListBuilder.create().mirror().addBox(0F, 0F, 0F, 16.0F, 1.0F, 16.0F), PartPose.offset(-8F, 23F, -8F));
-		PartDefinition partdef1 = partdefinition.addOrReplaceChild("Shape2", CubeListBuilder.create().mirror().addBox(0F, 0F, 0F, 14.0F, 3.0F, 10.0F), PartPose.offset(-7F, 20F, -3F));
-		PartDefinition partdef2 = partdefinition.addOrReplaceChild("Shape3", CubeListBuilder.create().mirror().addBox(-5F, 0F, 0F, 6.0F, 4.0F, 6.0F), PartPose.offset(-1F, 17F, -1.5F));
-		PartDefinition partdef3 = partdefinition.addOrReplaceChild("Shape4", CubeListBuilder.create().mirror().addBox(0F, 0F, 0F, 4.0F, 6.0F, 4.0F), PartPose.offset(-5F, 11F, -1F));
-		PartDefinition partdef4 = partdefinition.addOrReplaceChild("Shape5", CubeListBuilder.create().mirror().addBox(0F, 0F, 0F, 3.0F, 3.0F, 3.0F), PartPose.offset(-4.5F, 8F, -0.5F));
-		PartDefinition partdef5 = partdefinition.addOrReplaceChild("Shape6", CubeListBuilder.create().mirror().addBox(0F, 0F, 0F, 10.0F, 3.0F, 6.0F), PartPose.offset(-3.5F, 18F, 0F));
-		PartDefinition partdef6 = partdefinition.addOrReplaceChild("Shape7", CubeListBuilder.create().mirror().addBox(0F, 0F, 0F, 4.0F, 3.0F, 4.0F), PartPose.offset(2F, 15F, 1.5F));
-		PartDefinition partdef7 = partdefinition.addOrReplaceChild("Shape8", CubeListBuilder.create().mirror().addBox(0F, 0F, 0F, 3.0F, 3.0F, 3.0F), PartPose.offset(2.5F, 12.5F, 2F));
-		PartDefinition partdef8 = partdefinition.addOrReplaceChild("Shape9", CubeListBuilder.create().mirror().addBox(0F, 1F, 0F, 11.0F, 2.0F, 4.0F), PartPose.offset(-5F, 20F, -7F));
-		PartDefinition partdef9 = partdefinition.addOrReplaceChild("Shape10", CubeListBuilder.create().mirror().addBox(-2F, 0F, 0F, 4.0F, 2.0F, 4.0F), PartPose.offset(1F, 19F, -6.5F));
-		PartDefinition partdef10 = partdefinition.addOrReplaceChild("Shape11", CubeListBuilder.create().mirror().addBox(0F, 0F, 0F, 3.0F, 3.0F, 3.0F), PartPose.offset(-0.5F, 16.01333F, -6F));
+		PartDefinition partdef0 = partdefinition.addOrReplaceChild("Shape1", CubeListBuilder.create().texOffs(0, 0).mirror().addBox(0F, 0F, 0F, 16.0F, 1.0F, 16.0F), PartPose.offset(-8F, 23F, -8F));
+		PartDefinition partdef1 = partdefinition.addOrReplaceChild("Shape2", CubeListBuilder.create().texOffs(0, 19).mirror().addBox(0F, 0F, 0F, 14.0F, 3.0F, 10.0F), PartPose.offset(-7F, 20F, -3F));
+		PartDefinition partdef2 = partdefinition.addOrReplaceChild("Shape3", CubeListBuilder.create().texOffs(0, 0).mirror().addBox(-5F, 0F, 0F, 6.0F, 4.0F, 6.0F), PartPose.offset(-1F, 17F, -1.5F));
+		PartDefinition partdef3 = partdefinition.addOrReplaceChild("Shape4", CubeListBuilder.create().texOffs(0, 0).mirror().addBox(0F, 0F, 0F, 4.0F, 6.0F, 4.0F), PartPose.offset(-5F, 11F, -1F));
+		PartDefinition partdef4 = partdefinition.addOrReplaceChild("Shape5", CubeListBuilder.create().texOffs(48, 6).mirror().addBox(0F, 0F, 0F, 3.0F, 3.0F, 3.0F), PartPose.offset(-4.5F, 8F, -0.5F));
+		PartDefinition partdef5 = partdefinition.addOrReplaceChild("Shape6", CubeListBuilder.create().texOffs(32, 20).mirror().addBox(0F, 0F, 0F, 10.0F, 3.0F, 6.0F), PartPose.offset(-3.5F, 18F, 0F));
+		PartDefinition partdef6 = partdefinition.addOrReplaceChild("Shape7", CubeListBuilder.create().texOffs(0, 10).mirror().addBox(0F, 0F, 0F, 4.0F, 3.0F, 4.0F), PartPose.offset(2F, 15F, 1.5F));
+		PartDefinition partdef7 = partdefinition.addOrReplaceChild("Shape8", CubeListBuilder.create().texOffs(48, 12).mirror().addBox(0F, 0F, 0F, 3.0F, 3.0F, 3.0F), PartPose.offset(2.5F, 12.5F, 2F));
+		PartDefinition partdef8 = partdefinition.addOrReplaceChild("Shape9", CubeListBuilder.create().texOffs(0, 17).mirror().addBox(0F, 1F, 0F, 11.0F, 2.0F, 4.0F), PartPose.offset(-5F, 20F, -7F));
+		PartDefinition partdef9 = partdefinition.addOrReplaceChild("Shape10", CubeListBuilder.create().texOffs(0, 10).mirror().addBox(-2F, 0F, 0F, 4.0F, 2.0F, 4.0F), PartPose.offset(1F, 19F, -6.5F));
+		PartDefinition partdef10 = partdefinition.addOrReplaceChild("Shape11", CubeListBuilder.create().texOffs(48, 0).mirror().addBox(0F, 0F, 0F, 3.0F, 3.0F, 3.0F), PartPose.offset(-0.5F, 16.01333F, -6F));
 
 		return LayerDefinition.create(meshdefinition, 64, 32);
 	}
