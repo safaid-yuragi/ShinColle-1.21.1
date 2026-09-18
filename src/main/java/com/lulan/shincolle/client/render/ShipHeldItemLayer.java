@@ -3,7 +3,6 @@ package com.lulan.shincolle.client.render;
 import com.lulan.shincolle.client.model.ShipModel;
 import com.lulan.shincolle.client.model.ShipModelBaseAdv;
 import com.lulan.shincolle.config.ShinColleConfig;
-import com.lulan.shincolle.entity.BasicEntityShip;
 import com.lulan.shincolle.entity.IShipEmotion;
 import com.lulan.shincolle.reference.ID;
 
@@ -16,6 +15,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -24,13 +24,13 @@ import net.minecraft.world.level.block.Block;
  * held item layer for ships (legacy LayerShipHeldItem port).
  * Walks the model's arm bone chain and applies per-model item offsets.
  */
-public class ShipHeldItemLayer extends RenderLayer<BasicEntityShip, EntityModel<BasicEntityShip>>
+public class ShipHeldItemLayer extends RenderLayer<Mob, EntityModel<Mob>>
 {
 
     private final ItemInHandRenderer itemInHandRenderer;
 
 
-    public ShipHeldItemLayer(RenderLayerParent<BasicEntityShip, EntityModel<BasicEntityShip>> renderer,
+    public ShipHeldItemLayer(RenderLayerParent<Mob, EntityModel<Mob>> renderer,
                              ItemInHandRenderer itemInHandRenderer)
     {
         super(renderer);
@@ -39,10 +39,10 @@ public class ShipHeldItemLayer extends RenderLayer<BasicEntityShip, EntityModel<
 
     @Override
     public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight,
-                       BasicEntityShip entity, float limbSwing, float limbSwingAmount,
+                       Mob entity, float limbSwing, float limbSwingAmount,
                        float partialTick, float ageInTicks, float netHeadYaw, float headPitch)
     {
-        if (!entity.getStateFlag(ID.F.ShowHeldItem)) return;
+        if (!(entity instanceof IShipEmotion emo) || !emo.getStateFlag(ID.F.ShowHeldItem)) return;
 
         if (!(this.getParentModel() instanceof ShipModel<?> mainModel)) return;
 
@@ -62,7 +62,7 @@ public class ShipHeldItemLayer extends RenderLayer<BasicEntityShip, EntityModel<
         }
     }
 
-    private void renderHeldItem(BasicEntityShip entity, ItemStack stack, ItemDisplayContext type,
+    private void renderHeldItem(Mob entity, ItemStack stack, ItemDisplayContext type,
                                 HumanoidArm handSide, PoseStack poseStack, MultiBufferSource buffer,
                                 int packedLight, ShipModel<?> mainModel)
     {

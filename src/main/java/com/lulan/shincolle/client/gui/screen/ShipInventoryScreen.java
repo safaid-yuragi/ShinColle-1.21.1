@@ -12,8 +12,12 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.neoforge.network.PacketDistributor;
+
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 /**
  * ship inventory screen (legacy GuiShipInventory).
@@ -366,16 +370,55 @@ public class ShipInventoryScreen extends AbstractContainerScreen<ShipInventoryMe
     {
         super.render(g, mouseX, mouseY, partialTick);
 
-        //ship model preview inside the red viewport (x=160..250, y=6..128)
+        //ship model preview inside the red viewport (x=165..249, y=18..118)
         if (this.entity != null)
         {
-            InventoryScreen.renderEntityInInventoryFollowsMouse(g,
-                this.leftPos + 160, this.topPos + 6,
-                this.leftPos + 250, this.topPos + 128,
-                45, 0.0625F, mouseX, mouseY, this.entity);
+            renderShipModel(g, mouseX, mouseY);
         }
 
         this.renderTooltip(g, mouseX, mouseY);
+    }
+
+    /**
+     * legacy GuiShipInventory.drawEntityModel: the entity ORIGIN (feet) is
+     * placed at guiLeft+218, guiTop+100 with per-class GUI scale, facing the
+     * camera with mouse-follow. Rendered via InventoryScreen.renderEntityInInventory
+     * (origin-based) rather than the bbox-centering FollowsMouse helper so the
+     * model lands exactly where the legacy layout intends.
+     */
+    private void renderShipModel(GuiGraphics g, int mouseX, int mouseY)
+    {
+        float[] mp = this.entity.modelPosInGUI;    //{x,y,z,scale}
+        float scale = mp.length > 3 ? mp[3] : 50F;
+
+        //mouse-follow angles; legacy reference point is guiLeft+215, guiTop+60
+        float yaw = (float) Math.atan((this.leftPos + 215 - mouseX) / 40.0F);
+        float pitch = (float) Math.atan((this.topPos + 60 - mouseY) / 40.0F);
+
+        Quaternionf pose = new Quaternionf().rotateZ((float) Math.PI);
+        Quaternionf cam = new Quaternionf().rotateX(pitch * 20.0F * Mth.DEG_TO_RAD);
+        pose.mul(cam);
+
+        //save + face the camera
+        float bodyRot = this.entity.yBodyRot, yRot = this.entity.getYRot(),
+              xRot = this.entity.getXRot(), headRotO = this.entity.yHeadRotO,
+              headRot = this.entity.yHeadRot;
+        this.entity.yBodyRot = 180.0F + yaw * 20.0F;
+        this.entity.setYRot(180.0F + yaw * 40.0F);
+        this.entity.setXRot(-pitch * 20.0F);
+        this.entity.yHeadRot = this.entity.getYRot();
+        this.entity.yHeadRotO = this.entity.getYRot();
+
+        g.enableScissor(this.leftPos + 165, this.topPos + 18,
+                        this.leftPos + 249, this.topPos + 118);
+        InventoryScreen.renderEntityInInventory(g,
+            this.leftPos + 218 + mp[0], this.topPos + 100 + mp[1],
+            scale, new Vector3f(0F, 0F, 0F), pose, cam, this.entity);
+        g.disableScissor();
+
+        this.entity.yBodyRot = bodyRot; this.entity.setYRot(yRot);
+        this.entity.setXRot(xRot); this.entity.yHeadRotO = headRotO;
+        this.entity.yHeadRot = headRot;
     }
 
     /* ------------------------------------------------------------------ */

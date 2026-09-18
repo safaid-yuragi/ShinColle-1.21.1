@@ -7,6 +7,7 @@ import java.util.Map;
 import com.lulan.shincolle.client.model.MiscModel;
 import com.lulan.shincolle.client.model.ShipModel;
 import com.lulan.shincolle.entity.BasicEntityShip;
+import com.lulan.shincolle.entity.BasicEntityShipHostile;
 import com.lulan.shincolle.entity.EntityAirplaneTakoyaki;
 import com.lulan.shincolle.entity.IShipEmotion;
 import com.lulan.shincolle.registry.ModEntities;
@@ -23,17 +24,21 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
 
 /**
  * ship entity renderer (Phase 7).
  * Model / texture / shadow are resolved per entity via {@link ShipRenderTable}
- * keyed by {@link BasicEntityShip#getShipClassID()}.
+ * keyed by the entity's ship class id.
+ * Generic bound is {@link Mob} (not {@link BasicEntityShip}) so the same
+ * renderer covers both friendly ships and hostile *_mob / *_hime variants,
+ * matching the legacy RenderShipEntity which extended RenderLiving<EntityLiving>.
  */
-public class ShipRenderer extends MobRenderer<BasicEntityShip, EntityModel<BasicEntityShip>>
+public class ShipRenderer extends MobRenderer<Mob, EntityModel<Mob>>
 {
 
     /** baked model cache: shipClass -> model */
-    private final Map<Integer, EntityModel<BasicEntityShip>> models = new HashMap<>();
+    private final Map<Integer, EntityModel<Mob>> models = new HashMap<>();
     private final EntityRendererProvider.Context ctx;
     private ShipRenderTable.RenderInfo currentInfo;
 
@@ -47,18 +52,26 @@ public class ShipRenderer extends MobRenderer<BasicEntityShip, EntityModel<Basic
     }
 
     @SuppressWarnings("unchecked")
-    private EntityModel<BasicEntityShip> modelFor(int shipClass)
+    private EntityModel<Mob> modelFor(int shipClass)
     {
         return this.models.computeIfAbsent(shipClass, c ->
-            (EntityModel<BasicEntityShip>) ShipRenderTable.ship(c).factory.apply(
+            (EntityModel<Mob>) ShipRenderTable.ship(c).factory.apply(
                 this.ctx.getModelSet().bakeLayer(ShipRenderTable.ship(c).layer)));
     }
 
+    /** ship class id for either ship hierarchy (friendly or hostile) */
+    private static int shipClassOf(Mob e)
+    {
+        if (e instanceof BasicEntityShip s) return s.getShipClassID();
+        if (e instanceof BasicEntityShipHostile s) return s.getShipClassID();
+        return 0;
+    }
+
     @Override
-    public void render(BasicEntityShip entity, float yaw, float partialTick, PoseStack poseStack,
+    public void render(Mob entity, float yaw, float partialTick, PoseStack poseStack,
                        MultiBufferSource buffer, int packedLight)
     {
-        int cls = entity.getShipClassID();
+        int cls = shipClassOf(entity);
         this.currentInfo = ShipRenderTable.ship(cls);
         this.model = modelFor(cls);
         this.shadowRadius = this.currentInfo.shadow
@@ -72,11 +85,11 @@ public class ShipRenderer extends MobRenderer<BasicEntityShip, EntityModel<Basic
     }
 
     /** attach misc model list (e.g. MidwayHime takoyaki plane) once per model instance */
-    private void initMiscModel(BasicEntityShip entity)
+    private void initMiscModel(Mob entity)
     {
         if (!(this.model instanceof ShipModel<?> sm) || sm.miscModelList != null) return;
 
-        if (entity.getShipClassID() == ID.ShipClass.MidwayHime && Minecraft.getInstance().level != null)
+        if (shipClassOf(entity) == ID.ShipClass.MidwayHime && Minecraft.getInstance().level != null)
         {
             EntityAirplaneTakoyaki tako = new EntityAirplaneTakoyaki(
                 ModEntities.AIRPLANE_TAKOYAKI.get(), Minecraft.getInstance().level);
@@ -97,7 +110,7 @@ public class ShipRenderer extends MobRenderer<BasicEntityShip, EntityModel<Basic
 
     /** render attached misc models (takoyaki etc.) */
     @SuppressWarnings("unchecked")
-    private void renderMiscModels(BasicEntityShip host, float partialTick, PoseStack poseStack,
+    private void renderMiscModels(Mob host, float partialTick, PoseStack poseStack,
                                   MultiBufferSource buffer, int packedLight)
     {
         if (!(this.model instanceof ShipModel<?> sm) || sm.miscModelList == null) return;
@@ -131,21 +144,21 @@ public class ShipRenderer extends MobRenderer<BasicEntityShip, EntityModel<Basic
     }
 
     @Override
-    public ResourceLocation getTextureLocation(BasicEntityShip entity)
+    public ResourceLocation getTextureLocation(Mob entity)
     {
-        return ShipRenderTable.ship(entity.getShipClassID()).texture;
+        return ShipRenderTable.ship(shipClassOf(entity)).texture;
     }
 
     /** legacy: no body flip on death */
     @Override
-    protected float getFlipDegrees(BasicEntityShip entity)
+    protected float getFlipDegrees(Mob entity)
     {
         return 0F;
     }
 
     /** scale level affects model size via animScale inside models; nothing extra here */
     @Override
-    protected void scale(BasicEntityShip entity, PoseStack poseStack, float partialTick)
+    protected void scale(Mob entity, PoseStack poseStack, float partialTick)
     {
     }
 
