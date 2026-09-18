@@ -39,7 +39,8 @@ public class ShipCarrierAttackGoal extends Goal
     @Override
     public boolean canUse()
     {
-        if (this.host.getIsSitting() || this.host.getStateMinor(ID.M.CraneState) > 0)
+        if (this.host.getIsSitting() || this.host.getStateMinor(ID.M.CraneState) > 0 ||
+            this.host.getStateFlag(ID.F.NoFuel))
         {
             return false;
         }

@@ -35,8 +35,9 @@ public class ShipSkillAttackGoal extends Goal
     @Override
     public boolean canUse()
     {
-        //sitting / being craned: no skill attack, reset phase
-        if (this.host.getIsSitting() || this.host.getStateMinor(ID.M.CraneState) > 0)
+        //sitting / being craned / no fuel: no skill attack, reset phase
+        if (this.host.getIsSitting() || this.host.getStateMinor(ID.M.CraneState) > 0 ||
+            this.host.getStateFlag(ID.F.NoFuel))
         {
             if (this.host.getStateEmotion(ID.S.Phase) > 0)
             {

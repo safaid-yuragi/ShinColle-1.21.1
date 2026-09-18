@@ -545,6 +545,20 @@ abstract public class BasicEntityShip extends TamableAnimal implements IShipGuar
         return this.shipNavigate;
     }
 
+    /** no fuel: ship is dead weight — suppress self-propelled movement (still falls/knocked) */
+    @Override
+    public void travel(Vec3 input)
+    {
+        if (this.getStateFlag(ID.F.NoFuel))
+        {
+            super.travel(Vec3.ZERO);
+        }
+        else
+        {
+            super.travel(input);
+        }
+    }
+
     @Override
     protected void registerGoals()
     {

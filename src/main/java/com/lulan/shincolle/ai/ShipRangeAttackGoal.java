@@ -41,8 +41,9 @@ public class ShipRangeAttackGoal extends Goal
     @Override
     public boolean canUse()
     {
-        //sitting / being craned: no attack
-        if (this.host.getIsSitting() || this.host.getStateMinor(ID.M.CraneState) > 0)
+        //sitting / being craned / no fuel: no attack
+        if (this.host.getIsSitting() || this.host.getStateMinor(ID.M.CraneState) > 0 ||
+            this.host.getStateFlag(ID.F.NoFuel))
         {
             return false;
         }

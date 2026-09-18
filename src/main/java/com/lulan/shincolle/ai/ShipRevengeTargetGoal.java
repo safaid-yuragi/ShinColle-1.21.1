@@ -4,6 +4,7 @@ import java.util.EnumSet;
 
 import com.lulan.shincolle.entity.BasicEntityShipHostile;
 import com.lulan.shincolle.entity.IShipAttackBase;
+import com.lulan.shincolle.reference.ID;
 import com.lulan.shincolle.utility.TargetHelper;
 
 import net.minecraft.world.entity.Entity;
@@ -40,6 +41,11 @@ public class ShipRevengeTargetGoal extends Goal
     @Override
     public boolean canUse()
     {
+        if (this.host.getStateFlag(ID.F.NoFuel))
+        {
+            return false;
+        }
+
         if (this.oldRevengeTime != this.host.getEntityRevengeTime() &&
             this.host.getEntityRevengeTarget() != null)
         {

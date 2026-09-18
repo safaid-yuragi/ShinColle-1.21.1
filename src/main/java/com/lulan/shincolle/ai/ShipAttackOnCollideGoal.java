@@ -38,6 +38,7 @@ public class ShipAttackOnCollideGoal extends Goal
     public boolean canUse()
     {
         if (this.host2.isPassenger() || this.host.getIsSitting() ||
+            this.host.getStateFlag(ID.F.NoFuel) ||
             !this.host.getStateFlag(ID.F.UseMelee))
         {
             return false;

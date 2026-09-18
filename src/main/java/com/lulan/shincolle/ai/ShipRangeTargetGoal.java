@@ -79,6 +79,7 @@ public class ShipRangeTargetGoal extends Goal
     public boolean canUse()
     {
         if (this.host.getIsSitting() || this.host.getStateMinor(ID.M.CraneState) > 0 ||
+            this.host.getStateFlag(ID.F.NoFuel) ||
             this.host.getTickExisted() % 8 != 0)
         {
             return false;

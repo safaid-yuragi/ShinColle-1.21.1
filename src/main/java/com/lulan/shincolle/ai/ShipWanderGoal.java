@@ -49,6 +49,7 @@ public class ShipWanderGoal extends Goal
     public boolean canUse()
     {
         if (this.host.getIsRiding() || this.host.getIsSitting() ||
+            this.host.getStateFlag(ID.F.NoFuel) ||
             this.host.getStateMinor(ID.M.CraneState) > 0 ||
             this.host2.getRandom().nextInt(180) != 0)
         {

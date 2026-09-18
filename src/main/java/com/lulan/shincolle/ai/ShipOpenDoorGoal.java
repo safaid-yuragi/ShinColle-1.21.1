@@ -3,6 +3,8 @@ package com.lulan.shincolle.ai;
 import java.util.ArrayList;
 
 import com.lulan.shincolle.entity.IShipNavigator;
+import com.lulan.shincolle.entity.IShipState;
+import com.lulan.shincolle.reference.ID;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -47,6 +49,11 @@ public class ShipOpenDoorGoal extends Goal
     @Override
     public boolean canUse()
     {
+        if (this.host instanceof IShipState ship && ship.getStateFlag(ID.F.NoFuel))
+        {
+            return false;
+        }
+
         Path path = this.host2.getShipNavigate().getPath();
 
         if (!this.host.horizontalCollision)
