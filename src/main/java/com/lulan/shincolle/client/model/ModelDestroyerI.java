@@ -149,9 +149,9 @@ public class ModelDestroyerI<T extends Entity> extends ShipModel<T> implements I
 		Entity entity = this.entity;
 		float[] _a = this.beginRender();
 		float f = _a[0], f1 = _a[1], f2 = _a[2], f3 = _a[3], f4 = _a[4];
-		poseStack.translate(this.animTransX, this.animTransY, this.animTransZ);
-		poseStack.mulPose(this.animRot);
 		poseStack.scale(this.animScaleX, this.animScaleY, this.animScaleZ);
+		poseStack.mulPose(this.animRot);
+		poseStack.translate(this.animTransX, this.animTransY, this.animTransZ);
 
     	poseStack.pushPose();
     	
