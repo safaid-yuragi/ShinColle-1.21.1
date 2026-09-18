@@ -62,8 +62,8 @@ public abstract class ShipModel<T extends Entity> extends EntityModel<T>
     public float animScaleX = 1F, animScaleY = 1F, animScaleZ = 1F;
     public Quaternionf animRot = new Quaternionf();
 
-    /** baked model root, set by ShipRenderer for ground measurement */
-    public ModelPart modelRoot;
+    /** per-entity ground shift (render blocks) measured by ShipRenderer; key = entity id */
+    public static final Map<Integer, Float> GROUND_SHIFT = new HashMap<>();
 
 
     public ShipModel() {}
@@ -82,9 +82,6 @@ public abstract class ShipModel<T extends Entity> extends EntityModel<T>
         this.animRot.identity();
     }
 
-    /** entity-foot baseline used by LivingEntityRenderer (blocks below origin) */
-    private static final float GROUND_BASE = 1.501F;
-
     /** true while an inventory screen renders a model preview; skips grounding so
      *  the per-ship modelPosInGUI placement is not disturbed */
     public static boolean inGuiPreview = false;
@@ -93,77 +90,34 @@ public abstract class ShipModel<T extends Entity> extends EntityModel<T>
     public float[] beginRender()
     {
         this.glowLight = false;
-        this.groundToBaseline();
+        this.applyGroundShift();
         return new float[] {this.animLimbSwing, this.animLimbSwingAmount,
                             this.animAgeInTicks, this.animNetHeadYaw, this.animHeadPitch};
     }
 
     /**
      * Push the model down so its lowest rendered point meets the entity's feet.
-     * LivingEntityRenderer anchors the model origin 1.501 blocks above the feet;
-     * a model whose scaled reach (animScale * lowest geometry) falls short of that
-     * floats in mid-air.  Computed per-frame from the live pose so standing /
-     * dead / sitting poses all ground correctly.  Only ever pushes DOWN, so a
-     * model that already reaches the baseline is left untouched, and repeated
-     * calls within a frame are self-idempotent (the gap converges to ~0).
+     * ShipRenderer measures the real rendered lowest vertex each frame and stores
+     * the residual gap per entity in {@link #GROUND_SHIFT}; here we fold that into
+     * the animation translate so the model sits on the ground.  Because it is
+     * derived from the actual emitted vertices, it stays correct regardless of the
+     * per-model extra transforms (scale/rotate) applied inside renderToBuffer.
+     * The shift is expressed back into pre-rotation translate space.
      */
-    private void groundToBaseline()
+    private void applyGroundShift()
     {
-        if (inGuiPreview || this.modelRoot == null || this.animScaleY == 0F) return;
+        if (inGuiPreview || this.entity == null || this.animScaleY == 0F) return;
 
-        // lowest rendered point (down-positive): renderedY = animScale * (animRot * (v + animTrans)).y
-        final Quaternionf rot = this.animRot;
-        final float[] maxRotY = {Float.NEGATIVE_INFINITY};
-        final Vector3f tv = new Vector3f();
-        final Map<String,Boolean> visCache = new HashMap<>();
-        this.modelRoot.visit(new PoseStack(), (pose, path, index, cube) ->
-        {
-            // skip cubes belonging to parts that won't actually be drawn this frame
-            if (!visCache.computeIfAbsent(path, this::partRenders)) return;
-            for (int c = 0; c < 8; c++)
-            {
-                float cx = ((c & 1) == 0 ? cube.minX : cube.maxX) / 16F;
-                float cy = ((c & 2) == 0 ? cube.minY : cube.maxY) / 16F;
-                float cz = ((c & 4) == 0 ? cube.minZ : cube.maxZ) / 16F;
-                pose.pose().transformPosition(cx, cy, cz, tv);
-                tv.rotate(rot);
-                if (tv.y > maxRotY[0]) maxRotY[0] = tv.y;
-            }
-        });
-        if (maxRotY[0] == Float.NEGATIVE_INFINITY) return;
+        float shift = GROUND_SHIFT.getOrDefault(this.entity.getId(), 0F);
+        if (shift == 0F) return;
 
-        // rotate the accumulated translate into rendered space
-        float transDownY = new Vector3f(this.animTransX, this.animTransY, this.animTransZ)
-            .rotate(rot).y;
-        float reach = this.animScaleY * (maxRotY[0] + transDownY);
-        float gap = GROUND_BASE - reach;
-        if (gap <= 1.0E-4F) return;
-
-        // shift down by exactly the gap, expressed back in pre-rotation translate space
-        Vector3f d = new Vector3f(0F, gap / this.animScaleY, 0F)
-            .rotate(new Quaternionf(rot).conjugate());
+        float entScale = this.entity instanceof net.minecraft.world.entity.LivingEntity le
+            ? le.getScale() : 1F;
+        Vector3f d = new Vector3f(0F, shift / (entScale * this.animScaleY), 0F)
+            .rotate(new Quaternionf(this.animRot).conjugate());
         this.animTransX += d.x;
         this.animTransY += d.y;
         this.animTransZ += d.z;
-    }
-
-    /**
-     * Whether the part at the given visit path actually draws cubes this frame.
-     * ModelPart.visit ignores visibility, so we resolve "/A/B/C" and require every
-     * ancestor to be visible (an invisible part drops its whole subtree) plus the
-     * owning part itself visible and not skipDraw.
-     */
-    private boolean partRenders(String path)
-    {
-        ModelPart p = this.modelRoot;
-        if (p == null) return false;
-        for (String seg : path.split("/"))
-        {
-            if (seg.isEmpty()) continue;
-            if (!p.visible || !p.hasChild(seg)) return false;
-            p = p.getChild(seg);
-        }
-        return p.visible && !p.skipDraw;
     }
 
     /** capture entity for use in renderToBuffer (which has no entity parm) */

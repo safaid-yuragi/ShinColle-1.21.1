@@ -13,7 +13,10 @@ import com.lulan.shincolle.entity.IShipEmotion;
 import com.lulan.shincolle.registry.ModEntities;
 import com.lulan.shincolle.reference.ID;
 
+import org.joml.Vector3f;
+
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
@@ -58,9 +61,7 @@ public class ShipRenderer extends MobRenderer<Mob, EntityModel<Mob>>
         return this.models.computeIfAbsent(shipClass, c ->
         {
             ModelPart baked = this.ctx.getModelSet().bakeLayer(ShipRenderTable.ship(c).layer);
-            EntityModel<Mob> m = (EntityModel<Mob>) ShipRenderTable.ship(c).factory.apply(baked);
-            if (m instanceof ShipModel<?> sm) sm.modelRoot = baked;
-            return m;
+            return (EntityModel<Mob>) ShipRenderTable.ship(c).factory.apply(baked);
         });
     }
 
@@ -84,9 +85,65 @@ public class ShipRenderer extends MobRenderer<Mob, EntityModel<Mob>>
 
         initMiscModel(entity);
 
-        super.render(entity, yaw, partialTick, poseStack, buffer, packedLight);
+        // inventory previews keep their tuned modelPosInGUI placement; skip grounding
+        if (ShipModel.inGuiPreview)
+        {
+            super.render(entity, yaw, partialTick, poseStack, buffer, packedLight);
+            renderMiscModels(entity, partialTick, poseStack, buffer, packedLight);
+            return;
+        }
+
+        // Ground the model by measuring the real lowest rendered vertex and feeding the
+        // residual gap into ShipModel.GROUND_SHIFT (applied to animTrans in beginRender).
+        // Vertex positions reach us in render (camera) space, so "down" is measured along
+        // the world-up axis transformed into that space -- this stays correct even when
+        // the camera is pitched, unlike a raw camera-space Y comparison.
+        Vector3f up = poseStack.last().normal().transform(new Vector3f(0F, 1F, 0F));
+        if (up.lengthSquared() > 0F) up.normalize();
+        Vector3f feetPos = poseStack.last().pose().transformPosition(0F, 0F, 0F, new Vector3f());
+        float feetProj = feetPos.dot(up);
+
+        MinYTracker tracker = new MinYTracker(up);
+        MultiBufferSource wrapped = type -> tracker.wrap(buffer.getBuffer(type));
+
+        super.render(entity, yaw, partialTick, poseStack, wrapped, packedLight);
+
+        if (tracker.minDot != Float.POSITIVE_INFINITY)
+        {
+            float shift = ShipModel.GROUND_SHIFT.getOrDefault(entity.getId(), 0F);
+            float residual = tracker.minDot - feetProj;         // >0 floats, <0 over-corrected
+            float next = Mth.clamp(shift + residual, 0F, 8F);   // push down only, sane bound
+            ShipModel.GROUND_SHIFT.put(entity.getId(), next);
+        }
 
         renderMiscModels(entity, partialTick, poseStack, buffer, packedLight);
+    }
+
+    /** records the lowest rendered vertex along the world-up axis (world height) */
+    private static final class MinYTracker
+    {
+        final float ux, uy, uz;
+        float minDot = Float.POSITIVE_INFINITY;
+
+        MinYTracker(Vector3f up) { this.ux = up.x; this.uy = up.y; this.uz = up.z; }
+
+        VertexConsumer wrap(VertexConsumer delegate)
+        {
+            return new VertexConsumer()
+            {
+                @Override public VertexConsumer addVertex(float x, float y, float z)
+                {
+                    float d = x * ux + y * uy + z * uz;
+                    if (d < minDot) minDot = d;
+                    return delegate.addVertex(x, y, z);
+                }
+                @Override public VertexConsumer setColor(int r, int g, int b, int a) { return delegate.setColor(r, g, b, a); }
+                @Override public VertexConsumer setUv(float u, float v) { return delegate.setUv(u, v); }
+                @Override public VertexConsumer setUv1(int u, int v) { return delegate.setUv1(u, v); }
+                @Override public VertexConsumer setUv2(int u, int v) { return delegate.setUv2(u, v); }
+                @Override public VertexConsumer setNormal(float x, float y, float z) { return delegate.setNormal(x, y, z); }
+            };
+        }
     }
 
     /** attach misc model list (e.g. MidwayHime takoyaki plane) once per model instance */
