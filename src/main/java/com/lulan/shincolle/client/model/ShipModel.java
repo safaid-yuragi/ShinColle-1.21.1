@@ -96,9 +96,9 @@ public abstract class ShipModel<T extends Entity> extends EntityModel<T>
     }
 
     /**
-     * Push the model down so its lowest rendered point meets the entity's feet.
-     * ShipRenderer measures the real rendered lowest vertex each frame and stores
-     * the residual gap per entity in {@link #GROUND_SHIFT}; here we fold that into
+     * Push the model down so its effective bottom meets the entity's feet.
+     * ShipRenderer measures the rendered vertices each frame and stores the
+     * residual gap per entity in {@link #GROUND_SHIFT}; here we fold that into
      * the animation translate so the model sits on the ground.  Because it is
      * derived from the actual emitted vertices, it stays correct regardless of the
      * per-model extra transforms (scale/rotate) applied inside renderToBuffer.

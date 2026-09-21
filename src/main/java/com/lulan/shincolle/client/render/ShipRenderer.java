@@ -111,7 +111,8 @@ public class ShipRenderer extends MobRenderer<Mob, EntityModel<Mob>>
         if (tracker.minDot != Float.POSITIVE_INFINITY)
         {
             float shift = ShipModel.GROUND_SHIFT.getOrDefault(entity.getId(), 0F);
-            float residual = tracker.minDot - feetProj;         // >0 floats, <0 over-corrected
+            float groundDot = tracker.groundDot();              // effective bottom (skips thin spikes)
+            float residual = groundDot - feetProj;              // >0 floats, <0 over-corrected
             float next = Mth.clamp(shift + residual, 0F, 8F);   // push down only, sane bound
             ShipModel.GROUND_SHIFT.put(entity.getId(), next);
         }
@@ -119,13 +120,59 @@ public class ShipRenderer extends MobRenderer<Mob, EntityModel<Mob>>
         renderMiscModels(entity, partialTick, poseStack, buffer, packedLight);
     }
 
-    /** records the lowest rendered vertex along the world-up axis (world height) */
+    /** records rendered vertices so we can find the model's effective bottom */
     private static final class MinYTracker
     {
-        final float ux, uy, uz;
+        final Vector3f up;
         float minDot = Float.POSITIVE_INFINITY;
+        final java.util.ArrayList<Vector3f> verts = new java.util.ArrayList<>();
 
-        MinYTracker(Vector3f up) { this.ux = up.x; this.uy = up.y; this.uz = up.z; }
+        MinYTracker(Vector3f up) { this.up = new Vector3f(up); }
+
+        /**
+         * The model's effective ground-contact height along the world-up axis.
+         * A plain minimum would grab a thin keel/leg/antenna spike and leave the
+         * visible hull floating, so instead we walk up from the lowest vertex and
+         * stop where the accumulated geometry first has real extent in BOTH
+         * horizontal axes -- i.e. a surface/foot, not a protruding line.  A spread
+         * pair of feet reads as wide immediately, so feet still contact the ground.
+         */
+        float groundDot()
+        {
+            if (verts.isEmpty()) return Float.POSITIVE_INFINITY;
+
+            // horizontal axes perpendicular to up
+            Vector3f h1 = new Vector3f(up).cross(new Vector3f(0F, 0F, 1F));
+            if (h1.lengthSquared() < 1E-4F) h1 = new Vector3f(up).cross(new Vector3f(1F, 0F, 0F));
+            h1.normalize();
+            Vector3f h2 = new Vector3f(up).cross(h1);
+
+            int n = verts.size();
+            float[][] r = new float[n][3];              // {height, h1, h2}
+            for (int i = 0; i < n; i++)
+            {
+                Vector3f v = verts.get(i);
+                r[i][0] = v.dot(up); r[i][1] = v.dot(h1); r[i][2] = v.dot(h2);
+            }
+            java.util.Arrays.sort(r, java.util.Comparator.comparingDouble(a -> a[0]));
+
+            // model's full horizontal extent, to scale the "thin" threshold
+            float a1 = 1e9F, b1 = -1e9F, a2 = 1e9F, b2 = -1e9F;
+            for (float[] p : r) { a1=Math.min(a1,p[1]); b1=Math.max(b1,p[1]); a2=Math.min(a2,p[2]); b2=Math.max(b2,p[2]); }
+            float maxExtent = Math.max(b1 - a1, b2 - a2);
+
+            // lowest level where the narrow-axis extent is a real surface, not a spike.
+            // Capped at 0.18 so a standing model's feet (~0.2 wide) are never skipped.
+            float thr = Math.max(0.12F, Math.min(0.18F, 0.10F * maxExtent));
+            float c1 = 1e9F, d1 = -1e9F, c2 = 1e9F, d2 = -1e9F;
+            for (float[] p : r)
+            {
+                c1 = Math.min(c1, p[1]); d1 = Math.max(d1, p[1]);
+                c2 = Math.min(c2, p[2]); d2 = Math.max(d2, p[2]);
+                if (Math.min(d1 - c1, d2 - c2) >= thr) return p[0];
+            }
+            return r[0][0];
+        }
 
         VertexConsumer wrap(VertexConsumer delegate)
         {
@@ -133,8 +180,9 @@ public class ShipRenderer extends MobRenderer<Mob, EntityModel<Mob>>
             {
                 @Override public VertexConsumer addVertex(float x, float y, float z)
                 {
-                    float d = x * ux + y * uy + z * uz;
-                    if (d < minDot) minDot = d;
+                    float d = x * up.x + y * up.y + z * up.z;
+                    verts.add(new Vector3f(x, y, z));
+                    if (d < minDot) { minDot = d; }
                     return delegate.addVertex(x, y, z);
                 }
                 @Override public VertexConsumer setColor(int r, int g, int b, int a) { return delegate.setColor(r, g, b, a); }
